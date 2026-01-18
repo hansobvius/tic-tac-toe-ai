@@ -16,34 +16,36 @@ class HomeView extends StatelessWidget {
       backgroundColor: AppColors.onBackground,
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.onPrimary,
-        title: const Text('TIC TAC TOE'),
+        title: const Text('Welcome to Tic Tac Toe!'),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Welcome to Tic Tac Toe!', style: Theme.of(context).textTheme.headlineLarge),
-            ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              scrollDirection: Axis.vertical,
+            GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
-              itemCount: 3,
-              itemBuilder: (context, rowIndex) {
-                return ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  shrinkWrap: false,
-                  itemCount: 3,
-                  itemBuilder: (context, columnIndex) {
-                    return Container(
-                      height: 16.0,
-                      width: 16.0,
-                      color: Colors.amber,
-                      padding: EdgeInsets.all(.16),
-                      child: Text("$rowIndex / $columnIndex"),
-                    );
-                });
-            })
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 4.0,
+                mainAxisSpacing: 4.0,
+              ),
+              itemCount: 9,
+              itemBuilder: (context, index) {
+                final int rowIndex = index ~/ 3;
+                final int columnIndex = index % 3;
+                return Container(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                  alignment: Alignment.center,
+                  child: Text(
+                    "$rowIndex / $columnIndex",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    ),
+                  ),
+                );
+              },
+            )
           ],
         ),
       ),
@@ -53,7 +55,9 @@ class HomeView extends StatelessWidget {
 
 @Preview()
 Widget homePreview() {
+  DependencyInjection().initialize();
   return MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: HomeView(),
   );
 }
