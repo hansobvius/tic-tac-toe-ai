@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 import 'package:tic_tac_toe/application/dependency_injection/dependency.dart';
 import '../../../resources/theme/app_colors.dart';
@@ -34,15 +35,24 @@ class HomeView extends StatelessWidget {
               itemBuilder: (context, index) {
                 final int rowIndex = index ~/ 3;
                 final int columnIndex = index % 3;
-                return Container(
-                  color: Theme.of(context).colorScheme.primaryContainer,
-                  alignment: Alignment.center,
-                  child: Text(
-                    "$rowIndex / $columnIndex",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
-                    ),
-                  ),
+                return Observer(
+                  builder: (context) {
+                    return GestureDetector(
+                      onTap: () {
+                        print("CLICKED ROW $rowIndex / COLUMN $columnIndex");
+                      },
+                      child: Container(
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "$rowIndex / $columnIndex",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                 );
               },
             )
