@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:tic_tac_toe/application/dependency_injection/dependency.dart';
 
 class HomeView extends StatelessWidget {
-  const HomeView({super.key});
+  HomeView({super.key});
+
+  final viewModel = DependencyInjection().homeViewModel;
 
   @override
   Widget build(BuildContext context) {
-    // Example of retrieving the dependency
-    // final viewModel = DependencyInjection().homeViewModel;
 
     return Scaffold(
       appBar: AppBar(
