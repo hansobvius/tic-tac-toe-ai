@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 
 import 'package:tic_tac_toe/application/dependency_injection/dependency.dart';
-import 'package:tic_tac_toe/application/resources/theme/app_colors.dart';
+import '../../../resources/theme/app_colors.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({super.key});
@@ -36,6 +36,8 @@ class HomeView extends StatelessWidget {
                   itemCount: 3,
                   itemBuilder: (context, columnIndex) {
                     return Container(
+                      height: 16.0,
+                      width: 16.0,
                       color: Colors.amber,
                       padding: EdgeInsets.all(.16),
                       child: Text("$rowIndex / $columnIndex"),
@@ -51,7 +53,6 @@ class HomeView extends StatelessWidget {
 
 @Preview()
 Widget homePreview() {
-  DependencyInjection().initialize();
   return MaterialApp(
     home: HomeView(),
   );

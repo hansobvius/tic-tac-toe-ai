@@ -1,6 +1,6 @@
 // ignore: non_constant_identifier_names
 import 'package:flutter/material.dart';
-import 'package:tic_tac_toe/application/resources/theme/app_colors.dart';
+import 'package:tic_tac_toe/resources/theme/app_colors.dart';
 
 const colorScheme =  ColorScheme(
   brightness: Brightness.light,
