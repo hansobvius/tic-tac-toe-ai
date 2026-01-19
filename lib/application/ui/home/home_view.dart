@@ -40,9 +40,13 @@ class HomeView extends StatelessWidget {
 
                     String symbol = '';
 
+                    if (viewModel.userBoardState.contains(index)) symbol = "O";
+
+                    if (viewModel.oponentBoardState.contains(index)) symbol = "X";
+
                     return GestureDetector(
                       onTap: () {
-                        viewModel.setPlay(row: rowIndex, column: columnIndex);
+                        viewModel.setPlay(index: index);
                       },
                       child: Container(
                         color: Theme.of(context).colorScheme.primaryContainer,

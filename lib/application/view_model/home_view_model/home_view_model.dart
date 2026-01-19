@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 
 part 'home_view_model.g.dart';
@@ -12,17 +13,26 @@ abstract class HomeViewModelState with Store {
 
   String oponentSymbol = 'X';
 
-  @observable
-  List<List<int>> userBoardState = [];
+  List<int> gameSelectedIndex = [];
 
   @observable
-  List<List<int>> oponentBoardState = [];
+  List<int> userBoardState = [];
+
+  @observable
+  List<int> oponentBoardState = [];
 
   @action
-  void setPlay({required int row, required int column}) {
-    if (currentUserPlay) {
-      userBoardState.add([row, column]);
+  void setPlay({required int index}) {
+    debugPrint("VIEW_MODEL setPlay index: $index / currentUserPlay : $currentUserPlay");
+    if (currentUserPlay && !gameSelectedIndex.contains(index)) {
+      userBoardState.add(index);
+      gameSelectedIndex.add(index);
       currentUserPlay = false;
+    }
+    if (!currentUserPlay && !gameSelectedIndex.contains(index)) {
+      oponentBoardState.add(index);
+      gameSelectedIndex.add(index);
+      currentUserPlay = true;
     }
   }
 }

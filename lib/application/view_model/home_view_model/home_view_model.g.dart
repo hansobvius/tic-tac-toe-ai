@@ -15,13 +15,13 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
   );
 
   @override
-  List<List<int>> get userBoardState {
+  List<int> get userBoardState {
     _$userBoardStateAtom.reportRead();
     return super.userBoardState;
   }
 
   @override
-  set userBoardState(List<List<int>> value) {
+  set userBoardState(List<int> value) {
     _$userBoardStateAtom.reportWrite(value, super.userBoardState, () {
       super.userBoardState = value;
     });
@@ -33,13 +33,13 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
   );
 
   @override
-  List<List<int>> get oponentBoardState {
+  List<int> get oponentBoardState {
     _$oponentBoardStateAtom.reportRead();
     return super.oponentBoardState;
   }
 
   @override
-  set oponentBoardState(List<List<int>> value) {
+  set oponentBoardState(List<int> value) {
     _$oponentBoardStateAtom.reportWrite(value, super.oponentBoardState, () {
       super.oponentBoardState = value;
     });
@@ -51,12 +51,12 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
   );
 
   @override
-  void setPlay({required int row, required int column}) {
+  void setPlay({required int index}) {
     final _$actionInfo = _$HomeViewModelStateActionController.startAction(
       name: 'HomeViewModelState.setPlay',
     );
     try {
-      return super.setPlay(row: row, column: column);
+      return super.setPlay(index: index);
     } finally {
       _$HomeViewModelStateActionController.endAction(_$actionInfo);
     }
