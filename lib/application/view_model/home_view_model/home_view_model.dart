@@ -16,10 +16,10 @@ abstract class HomeViewModelState with Store {
   List<int> gameSelectedIndex = [];
 
   @observable
-  List<int> userBoardState = [];
+  ObservableList<int> userBoardState = ObservableList<int>();
 
   @observable
-  List<int> oponentBoardState = [];
+  ObservableList<int> oponentBoardState = ObservableList<int>();
 
   @action
   void setPlay({required int index}) {

@@ -15,13 +15,13 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
   );
 
   @override
-  List<int> get userBoardState {
+  ObservableList<int> get userBoardState {
     _$userBoardStateAtom.reportRead();
     return super.userBoardState;
   }
 
   @override
-  set userBoardState(List<int> value) {
+  set userBoardState(ObservableList<int> value) {
     _$userBoardStateAtom.reportWrite(value, super.userBoardState, () {
       super.userBoardState = value;
     });
@@ -33,13 +33,13 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
   );
 
   @override
-  List<int> get oponentBoardState {
+  ObservableList<int> get oponentBoardState {
     _$oponentBoardStateAtom.reportRead();
     return super.oponentBoardState;
   }
 
   @override
-  set oponentBoardState(List<int> value) {
+  set oponentBoardState(ObservableList<int> value) {
     _$oponentBoardStateAtom.reportWrite(value, super.oponentBoardState, () {
       super.oponentBoardState = value;
     });
