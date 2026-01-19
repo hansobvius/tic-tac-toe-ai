@@ -37,16 +37,24 @@ class HomeView extends StatelessWidget {
                 final int columnIndex = index % 3;
                 return Observer(
                   builder: (context) {
+
+                    String symbol = '';
+
+                    if (viewModel.userBoardState.contains(index)) symbol = "O";
+
+                    if (viewModel.oponentBoardState.contains(index)) symbol = "X";
+
                     return GestureDetector(
                       onTap: () {
-                        print("CLICKED ROW $rowIndex / COLUMN $columnIndex");
+                        viewModel.setPlay(index: index);
                       },
                       child: Container(
                         color: Theme.of(context).colorScheme.primaryContainer,
                         alignment: Alignment.center,
                         child: Text(
-                          "$rowIndex / $columnIndex",
+                          symbol,
                           style: TextStyle(
+                            fontWeight: FontWeight.w900,
                             color: Theme.of(context).colorScheme.onPrimaryContainer,
                           ),
                         ),
