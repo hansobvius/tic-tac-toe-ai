@@ -35,4 +35,12 @@ abstract class HomeViewModelState with Store {
       currentUserPlay = true;
     }
   }
+
+  String getSymbol(int index) {
+    if (userBoardState.contains(index)) {userSymbol = "O";}
+
+    if (oponentBoardState.contains(index)) {oponentSymbol = "X";}
+
+    return '';
+  }
 }
