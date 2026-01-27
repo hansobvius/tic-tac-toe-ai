@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
+import 'package:tic_tac_toe/domain/game_logic/game_victory_condition.dart';
+
 
 part 'home_view_model.g.dart';
 
@@ -53,6 +55,14 @@ abstract class HomeViewModelState with Store {
   }
   
   void isWinner() {
-    if (currentUserPlay) {}
+    if (hasWinnerNumbers(userBoardState)) {
+      debugPrint("USER WON");
+      isGameTerminated = true;
+    }
+
+    if (hasWinnerNumbers(oponentBoardState)) {
+      debugPrint("OPPONENT WON");
+      isGameTerminated = true;
+    }
   }
 }

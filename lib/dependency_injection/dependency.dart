@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:tic_tac_toe/application/view_model/home_view_model/home_view_model.dart';
+import 'package:tic_tac_toe/presentation/view_model/home_view_model/home_view_model.dart';
 
 /// Service Locator for managing app dependencies.
 class DependencyInjection {

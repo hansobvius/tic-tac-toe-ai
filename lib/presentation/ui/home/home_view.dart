@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
-import 'package:tic_tac_toe/application/dependency_injection/dependency.dart';
+import 'package:tic_tac_toe/dependency_injection/dependency.dart';
 import '../../../resources/colors/theme/app_colors.dart';
 
 class HomeView extends StatelessWidget {

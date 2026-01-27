@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:tic_tac_toe/resources/colors/color_scheme.dart';
-import 'package:tic_tac_toe/application/routes/routes.dart';
+import 'package:tic_tac_toe/presentation/routes/routes.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
