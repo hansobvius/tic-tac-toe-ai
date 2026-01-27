@@ -6,14 +6,16 @@ part 'home_view_model.g.dart';
 class HomeViewModel = HomeViewModelState with _$HomeViewModel;
 
 abstract class HomeViewModelState with Store {
+
+  final String userSymbol = 'O';
+
+  final String oponentSymbol = 'X';
+
+  final List<int> gameSelectedIndex = [];
   
   bool currentUserPlay = true;
 
-  String userSymbol = 'O';
-
-  String oponentSymbol = 'X';
-
-  List<int> gameSelectedIndex = [];
+  bool isGameTerminated = false;
 
   @observable
   ObservableList<int> userBoardState = ObservableList<int>();
@@ -28,19 +30,29 @@ abstract class HomeViewModelState with Store {
       userBoardState.add(index);
       gameSelectedIndex.add(index);
       currentUserPlay = false;
+      isWinner();
     }
     if (!currentUserPlay && !gameSelectedIndex.contains(index)) {
       oponentBoardState.add(index);
       gameSelectedIndex.add(index);
       currentUserPlay = true;
+      isWinner();
     }
   }
 
   String getSymbol(int index) {
-    if (userBoardState.contains(index)) {userSymbol = "O";}
+    if (userBoardState.contains(index)) {
+      return userSymbol;
+    }
 
-    if (oponentBoardState.contains(index)) {oponentSymbol = "X";}
+    if (oponentBoardState.contains(index)) {
+      return oponentSymbol;
+    }
 
     return '';
+  }
+  
+  void isWinner() {
+    if (currentUserPlay) {}
   }
 }
