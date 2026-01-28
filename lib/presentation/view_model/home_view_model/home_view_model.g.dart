@@ -9,6 +9,42 @@ part of 'home_view_model.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$HomeViewModel on HomeViewModelState, Store {
+  late final _$currentUserPlayAtom = Atom(
+    name: 'HomeViewModelState.currentUserPlay',
+    context: context,
+  );
+
+  @override
+  bool get currentUserPlay {
+    _$currentUserPlayAtom.reportRead();
+    return super.currentUserPlay;
+  }
+
+  @override
+  set currentUserPlay(bool value) {
+    _$currentUserPlayAtom.reportWrite(value, super.currentUserPlay, () {
+      super.currentUserPlay = value;
+    });
+  }
+
+  late final _$isGameTerminatedAtom = Atom(
+    name: 'HomeViewModelState.isGameTerminated',
+    context: context,
+  );
+
+  @override
+  bool get isGameTerminated {
+    _$isGameTerminatedAtom.reportRead();
+    return super.isGameTerminated;
+  }
+
+  @override
+  set isGameTerminated(bool value) {
+    _$isGameTerminatedAtom.reportWrite(value, super.isGameTerminated, () {
+      super.isGameTerminated = value;
+    });
+  }
+
   late final _$userBoardStateAtom = Atom(
     name: 'HomeViewModelState.userBoardState',
     context: context,
@@ -65,6 +101,8 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
   @override
   String toString() {
     return '''
+currentUserPlay: ${currentUserPlay},
+isGameTerminated: ${isGameTerminated},
 userBoardState: ${userBoardState},
 oponentBoardState: ${oponentBoardState}
     ''';

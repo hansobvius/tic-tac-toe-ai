@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tic_tac_toe/application/ui/home/home_view.dart';
+import 'package:tic_tac_toe/presentation/ui/home/home_view.dart';
 
 class Routes {
   static const String home = '/';

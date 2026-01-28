@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
-import 'package:tic_tac_toe/application/dependency_injection/dependency.dart';
-import '../../../resources/theme/app_colors.dart';
+import 'package:tic_tac_toe/dependency_injection/dependency.dart';
+import '../../../resources/colors/theme/app_colors.dart';
 
 class HomeView extends StatelessWidget {
   HomeView({super.key});
@@ -38,11 +38,7 @@ class HomeView extends StatelessWidget {
                 return Observer(
                   builder: (context) {
 
-                    String symbol = '';
-
-                    if (viewModel.userBoardState.contains(index)) symbol = "O";
-
-                    if (viewModel.oponentBoardState.contains(index)) symbol = "X";
+                    var fontSize = MediaQuery.of(context).size.width * 0.25;
 
                     return GestureDetector(
                       onTap: () {
@@ -52,8 +48,9 @@ class HomeView extends StatelessWidget {
                         color: Theme.of(context).colorScheme.primaryContainer,
                         alignment: Alignment.center,
                         child: Text(
-                          symbol,
+                          viewModel.getSymbol(index),
                           style: TextStyle(
+                            fontSize: fontSize,
                             fontWeight: FontWeight.w900,
                             color: Theme.of(context).colorScheme.onPrimaryContainer,
                           ),
