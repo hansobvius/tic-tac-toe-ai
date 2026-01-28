@@ -56,6 +56,10 @@ abstract class HomeViewModelState with Store {
             debugPrint("USER WON");
         } else if (_gameRule.winnerPlayer == 2) {
              debugPrint("OPPONENT WON");
+        } else if (_gameRule.isGameDraw) {
+          debugPrint("GAME DRAW");
+        } else {
+          debugPrint("STATE NOT MAPPED");
         }
     }
   }
