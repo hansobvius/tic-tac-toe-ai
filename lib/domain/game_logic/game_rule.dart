@@ -8,6 +8,8 @@ class GameRule {
   bool currentUserPlay = true;
 
   bool isGameTerminated = false;
+
+  bool isGameDraw = false;
   
   // 1 = Player 1 (User), 2 = Player 2 (Opponent), null = No winner yet
   int? winnerPlayer;
@@ -39,5 +41,17 @@ class GameRule {
        isGameTerminated = true;
        winnerPlayer = 2;
     }
+
+    if (gameModel.selectedBoardSquares.length == 9) {
+      isGameTerminated = true;
+      isGameDraw = true;
+    }
+  }
+
+  void reset() {
+    isGameTerminated = false;
+    currentUserPlay = true;
+    winnerPlayer = null;
+    isGameDraw = false;
   }
 }
