@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
-import 'package:tic_tac_toe/domain/game_logic/game_victory_condition.dart';
+import 'package:tic_tac_toe/dependency_injection/dependency.dart';
+
+import 'package:tic_tac_toe/domain/game_logic/game_rule.dart';
 
 
 part 'home_view_model.g.dart';
@@ -9,14 +11,19 @@ class HomeViewModel = HomeViewModelState with _$HomeViewModel;
 
 abstract class HomeViewModelState with Store {
 
+  final GameRule _gameRule = DependencyInjection().gameRule;
+
   final String userSymbol = 'O';
 
   final String oponentSymbol = 'X';
 
-  final List<int> gameSelectedIndex = [];
+  // Exposed for UI if needed, but logic is in specific board states
+  List<int> get gameSelectedIndex => _gameRule.gameModel.selectedBoardSquares;
   
+  @observable
   bool currentUserPlay = true;
 
+  @observable
   bool isGameTerminated = false;
 
   @observable
@@ -28,17 +35,28 @@ abstract class HomeViewModelState with Store {
   @action
   void setPlay({required int index}) {
     debugPrint("VIEW_MODEL setPlay index: $index / currentUserPlay : $currentUserPlay");
-    if (currentUserPlay && !gameSelectedIndex.contains(index)) {
-      userBoardState.add(index);
-      gameSelectedIndex.add(index);
-      currentUserPlay = false;
-      isWinner();
-    }
-    if (!currentUserPlay && !gameSelectedIndex.contains(index)) {
-      oponentBoardState.add(index);
-      gameSelectedIndex.add(index);
-      currentUserPlay = true;
-      isWinner();
+
+    /// If the index selected already included into game list, the method skips
+    if (gameSelectedIndex.contains(index)) return;
+    
+    _gameRule.play(index);
+    
+    // Sync state
+    userBoardState
+      ..clear()
+      ..addAll(_gameRule.gameModel.firstBoardSquares);
+    oponentBoardState
+      ..clear()
+      ..addAll(_gameRule.gameModel.secondBoardSquares);
+    currentUserPlay = _gameRule.currentUserPlay;
+    isGameTerminated = _gameRule.isGameTerminated;
+    
+    if (isGameTerminated) {
+        if (_gameRule.winnerPlayer == 1) { 
+            debugPrint("USER WON");
+        } else if (_gameRule.winnerPlayer == 2) {
+             debugPrint("OPPONENT WON");
+        }
     }
   }
 
@@ -52,17 +70,5 @@ abstract class HomeViewModelState with Store {
     }
 
     return '';
-  }
-  
-  void isWinner() {
-    if (hasWinnerNumbers(userBoardState)) {
-      debugPrint("USER WON");
-      isGameTerminated = true;
-    }
-
-    if (hasWinnerNumbers(oponentBoardState)) {
-      debugPrint("OPPONENT WON");
-      isGameTerminated = true;
-    }
   }
 }

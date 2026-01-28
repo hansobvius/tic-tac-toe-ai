@@ -1,18 +1,25 @@
 class GameModel {
 
   GameModel({
-    required this.selectedBoardSquares,
-    required this.firstBoardSquares,
-    required this.secondBoardSquares,
-    required this.firstPlayerWins,
-    required this.secondPlayerWins,
-    required this.rounds
-  });
+    List<int>? selectedBoardSquares,
+    List<int>? firstBoardSquares,
+    List<int>? secondBoardSquares,
+    this.firstPlayerWins = 0,
+    this.secondPlayerWins = 0,
+    this.rounds = 0,
+  }) : selectedBoardSquares = selectedBoardSquares ?? [],
+       firstBoardSquares = firstBoardSquares ?? [],
+       secondBoardSquares = secondBoardSquares ?? [];
 
-  List<int> selectedBoardSquares = [];
-  List<int> firstBoardSquares = [];
-  List<int> secondBoardSquares = [];
-  int firstPlayerWins = 0;
-  int secondPlayerWins = 0;
-  int rounds = 0;
+  List<int> selectedBoardSquares;
+
+  List<int> firstBoardSquares;
+
+  List<int> secondBoardSquares;
+
+  int firstPlayerWins;
+
+  int secondPlayerWins;
+
+  int rounds;
 }
