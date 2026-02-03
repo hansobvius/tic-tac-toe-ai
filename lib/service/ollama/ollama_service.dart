@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class OllamaService {
-  static const String _baseUrl = 'http://localhost:11434/api/generate';
+  final String _baseUrl;
   final String modelName;
 
-  OllamaService({this.modelName = 'llama3'});
+  OllamaService({this.modelName = 'llama3', String? baseUrl})
+      : _baseUrl = baseUrl ??
+            'http://localhost:${dotenv.env['PORT'] ?? '11434'}/api/generate';
 
 
   Future<int> getNextMove(List<int> boardState, List<int> yourMoves) async {

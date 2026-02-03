@@ -5,9 +5,13 @@ void main() {
   group('OllamaService Integration Test', () {
     late OllamaService ollamaService;
 
-    setUp(() {
+    setUp(() async {
       // Ensure you have this model pulled in your local ollama: `ollama pull llama3`
-      ollamaService = OllamaService(modelName: 'llama3');
+      // We pass the baseUrl directly to avoid needing to load .env in the test environment
+      ollamaService = OllamaService(
+        modelName: 'llama3',
+        baseUrl: 'http://localhost:11434/api/generate',
+      );
     });
 
     test('getNextMove returns a valid move index (0-8) from real Ollama instance', () async {
