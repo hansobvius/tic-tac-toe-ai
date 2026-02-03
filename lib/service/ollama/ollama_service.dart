@@ -9,8 +9,8 @@ class OllamaService implements AiServiceInterface {
   OllamaService({this.modelName = 'llama3'});
 
   @override
-  Future<int> getNextMove(List<int> boardState) async {
-    final prompt = _generatePrompt(boardState);
+  Future<int> getNextMove(List<int> boardState, List<int> yourMoves) async {
+    final prompt = _generatePrompt(boardState, yourMoves);
     
     try {
       final response = await http.post(
@@ -36,7 +36,7 @@ class OllamaService implements AiServiceInterface {
     }
   }
 
-  String _generatePrompt(List<int> boardState) {
+  String _generatePrompt(List<int> boardState, List<int> yourMoves) {
     return '''
 You are playing Tic Tac Toe. You are Player 2 (O).
 The current board state is represented as a list of 9 integers where:
@@ -44,7 +44,10 @@ The current board state is represented as a list of 9 integers where:
 1 = Player 1 (Opponent)
 2 = Player 2 (You)
 
-Board State: $boardState
+The Board State represents the already choosen indicies, and you cannot choose any of them.
+Current Board State: $boardState
+The Your Moves Represents your previously moves.
+Current Your Moves: $yourMoves
 Indices:
 0 1 2
 3 4 5
