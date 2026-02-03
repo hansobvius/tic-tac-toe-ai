@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../ai_service_interface.dart';
-
-class OllamaService implements AiServiceInterface {
+class OllamaService {
   static const String _baseUrl = 'http://localhost:11434/api/generate';
   final String modelName;
 
   OllamaService({this.modelName = 'llama3'});
 
-  @override
+
   Future<int> getNextMove(List<int> boardState, List<int> yourMoves) async {
     final prompt = _generatePrompt(boardState, yourMoves);
     

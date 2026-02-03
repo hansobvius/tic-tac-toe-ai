@@ -1,4 +1,4 @@
-abstract class AiServiceInterface {
+abstract class AiRepository {
   /// Sends the current board state to the AI and returns the index of the next move.
   /// 
   /// [boardState] is a list of 9 integers where:
