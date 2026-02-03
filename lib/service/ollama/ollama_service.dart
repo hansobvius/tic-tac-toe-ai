@@ -27,7 +27,7 @@ class OllamaService {
         final responseText = jsonResponse['response'];
         return _parseMove(responseText);
       } else {
-        throw Exception('Failed to get move from Ollama: ${response.statusCode}');
+        throw Exception('Failed to get move from Ollama: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       throw Exception('Error communicating with Ollama: $e');
