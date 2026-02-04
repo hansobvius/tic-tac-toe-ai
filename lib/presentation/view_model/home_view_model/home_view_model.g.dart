@@ -135,6 +135,24 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
     });
   }
 
+  late final _$errorMessageAtom = Atom(
+    name: 'HomeViewModelState.errorMessage',
+    context: context,
+  );
+
+  @override
+  String? get errorMessage {
+    _$errorMessageAtom.reportRead();
+    return super.errorMessage;
+  }
+
+  @override
+  set errorMessage(String? value) {
+    _$errorMessageAtom.reportWrite(value, super.errorMessage, () {
+      super.errorMessage = value;
+    });
+  }
+
   late final _$setPlayAsyncAction = AsyncAction(
     'HomeViewModelState.setPlay',
     context: context,
@@ -171,7 +189,8 @@ opponnetThinking: ${opponnetThinking},
 currentUserPlay: ${currentUserPlay},
 isGameTerminated: ${isGameTerminated},
 userBoardState: ${userBoardState},
-oponentBoardState: ${oponentBoardState}
+oponentBoardState: ${oponentBoardState},
+errorMessage: ${errorMessage}
     ''';
   }
 }

@@ -11,7 +11,7 @@ class OllamaService {
             'http://localhost:${dotenv.env['PORT'] ?? '11434'}/api/generate';
 
 
-  Future<int> getNextMove(List<int> boardState, List<int> yourMoves) async {
+  Future<(int?, String?)> getNextMove(List<int> boardState, List<int> yourMoves) async {
     final prompt = _generatePrompt(boardState, yourMoves);
     
     try {
@@ -27,14 +27,23 @@ class OllamaService {
       );
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        final responseText = jsonResponse['response'];
-        return _parseMove(responseText);
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+        if (jsonResponse.containsKey('response')) {
+          final responseText = jsonResponse['response'];
+          try {
+             final move = _parseMove(responseText);
+             return (move, null);
+          } catch (e) {
+             return (null, 'Failed to parse AI response: $responseText');
+          }
+        }
+        return (null, 'Key "response" not found in JSON');
+
       } else {
-        throw Exception('Failed to get move from Ollama: ${response.statusCode} - ${response.body}');
+        return (null, 'Failed to get move from Ollama: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      throw Exception('Error communicating with Ollama: $e');
+      return (null, 'Error communicating with Ollama: $e');
     }
   }
 
