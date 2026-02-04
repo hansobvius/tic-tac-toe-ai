@@ -49,6 +49,7 @@ class GameRule {
   }
 
   void reset() {
+    gameModel = GameModel();
     isGameTerminated = false;
     currentUserPlay = true;
     winnerPlayer = null;

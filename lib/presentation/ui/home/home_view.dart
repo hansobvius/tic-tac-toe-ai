@@ -22,38 +22,6 @@ class HomeView extends StatelessWidget {
       body: Center(
         child: Stack(
           children: [
-            Observer(
-              builder: (builder) {
-                if (viewModel.isGameTerminated) {
-                  return Column(
-                    mainAxisAlignment: .center,
-                    children: [
-                      Container(
-                        color: Colors.black38,
-                        width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16.0),
-                            color: Colors.white,
-                          ),
-                          child: Text(viewModel.winner,
-                            style: TextStyle(
-                              color: Colors.white
-                            )
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: viewModel.resetGame,
-                        child: const Text('OK'),
-                      ),
-
-                    ],
-                  );
-                }
-                return SizedBox();
-              }),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -149,6 +117,43 @@ class HomeView extends StatelessWidget {
                 )
               ],
             ),
+            Observer(
+              builder: (builder) {
+                if (viewModel.isGameTerminated) {
+                  return Container(
+                    color: Colors.black38,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(viewModel.winner,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              )
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: viewModel.resetGame,
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                return SizedBox();
+              }),
           ],
         ),
       ),

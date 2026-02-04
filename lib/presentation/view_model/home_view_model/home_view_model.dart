@@ -80,9 +80,12 @@ abstract class HomeViewModelState with Store {
 
   @action
   void resetGame() {
+     _gameRule.reset();
     gameSelectedIndex.clear();
     userBoardState.clear();
     oponentBoardState.clear();
+    isGameTerminated = false;
+    winner = "";
   }
 
   String getSymbol(int index) {
