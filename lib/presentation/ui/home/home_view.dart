@@ -23,6 +23,58 @@ class HomeView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Row(
+              mainAxisAlignment: .spaceBetween,
+              children: [
+                Observer(
+                  builder: (context) {
+                    return Column(
+                      children: [
+                        Text("Player",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 32.0
+                          )
+                        ),
+                        Padding(padding: EdgeInsetsGeometry.only(
+                          bottom: 16.0
+                        )),
+                        Text("${viewModel.playerScore}",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0
+                            ))
+                      ],
+                    );
+                  }
+                ),
+                Observer(
+                  builder: (context) {
+                    return Column(
+                      children: [
+                        Text("Opponent",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 32.0
+                          )),
+                        Padding(padding: EdgeInsetsGeometry.only(
+                          bottom: 16.0
+                        )),
+                        Text("${viewModel.opponentScore}",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16.0
+                            ))
+                      ],
+                    );
+                  }
+                )
+              ],
+            ),
             GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
               shrinkWrap: true,
