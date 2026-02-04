@@ -45,7 +45,7 @@ abstract class HomeViewModelState with Store {
     debugPrint("VIEW_MODEL setPlay index: $index / currentUserPlay : $currentUserPlay");
 
     /// If the index selected already included into game list, the method skips
-    if (gameSelectedIndex.contains(index)) return;
+
     
     _gameRule.play(index);
     
@@ -81,7 +81,7 @@ abstract class HomeViewModelState with Store {
   @action
   void resetGame() {
      _gameRule.reset();
-    gameSelectedIndex.clear();
+
     userBoardState.clear();
     oponentBoardState.clear();
     isGameTerminated = false;
