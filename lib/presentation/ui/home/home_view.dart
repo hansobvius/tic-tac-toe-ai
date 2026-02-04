@@ -114,6 +114,21 @@ class HomeView extends StatelessWidget {
                       }
                     );
                   },
+                ),
+                Observer(
+                  builder: (context) {
+                    if (viewModel.opponnetThinking) {
+                      return Text(
+                        "Opponent is thinking...",
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 32.0
+                        )
+                      );
+                    }
+                    return SizedBox();
+                  },
                 )
               ],
             ),
