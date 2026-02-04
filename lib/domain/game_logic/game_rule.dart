@@ -1,7 +1,12 @@
+import 'package:tic_tac_toe/data/repository/ai_repository_impl.dart';
+import 'package:tic_tac_toe/dependency_injection/dependency.dart';
 import 'package:tic_tac_toe/domain/entities/game_model.dart';
 import 'package:tic_tac_toe/domain/game_logic/game_victory_condition.dart';
+import 'package:tic_tac_toe/domain/repository/ai_repository.dart';
 
 class GameRule {
+
+  final AiRepositoryImpl _aiRepositoryImpl = DependencyInjection().aiRepositoryImpl;
   
   GameModel _gameModel = GameModel();
 
@@ -24,12 +29,17 @@ class GameRule {
       _gameModel.selectedBoardSquares.add(index);
       currentUserPlay = false;
       checkWinner();
-    } else if (!currentUserPlay && !_gameModel.selectedBoardSquares.contains(index)) {
-      _gameModel.secondBoardSquares.add(index);
-      _gameModel.selectedBoardSquares.add(index);
-      currentUserPlay = true;
-      checkWinner();
-    }
+    } 
+  }
+
+  Future<int> opponentPlay(List<int> opponnetBoardIndicies) async {
+    var index = await _aiRepositoryImpl.getNextMove(
+      _gameModel.selectedBoardSquares, opponnetBoardIndicies);
+    _gameModel.secondBoardSquares.add(index);
+    _gameModel.selectedBoardSquares.add(index);
+    currentUserPlay = true;
+    checkWinner();
+    return index;
   }
 
   void checkWinner() {

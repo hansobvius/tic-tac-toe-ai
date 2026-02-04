@@ -27,6 +27,9 @@ abstract class HomeViewModelState with Store {
 
   @observable
   int opponentScore = 0;
+
+  @observable
+  bool opponnetThinking = false;
   
   @observable
   bool currentUserPlay = true;
@@ -41,11 +44,10 @@ abstract class HomeViewModelState with Store {
   ObservableList<int> oponentBoardState = ObservableList<int>();
 
   @action
-  void setPlay({required int index}) {
+  Future setPlay({required int index}) async {
     debugPrint("VIEW_MODEL setPlay index: $index / currentUserPlay : $currentUserPlay");
 
     /// If the index selected already included into game list, the method skips
-
     
     _gameRule.play(index);
     
@@ -65,23 +67,40 @@ abstract class HomeViewModelState with Store {
           var label = "USER WON";
           winner = label;
           debugPrint(label);
-        } else if (_gameRule.winnerPlayer == 2) {
-          opponentScore++;
-          var label = "OPPONENT WON";
-          winner = label;
-          debugPrint(label);
         } else if (_gameRule.isGameDraw) {
           debugPrint("GAME DRAW");
         } else {
           debugPrint("STATE NOT MAPPED");
         }
     }
+    else if (!_gameRule.currentUserPlay) {
+      opponnetThinking = true;
+      await _gameRule.opponentPlay(oponentBoardState).then((value) {
+        oponentBoardState
+            ..clear()
+            ..addAll(_gameRule.gameModel.secondBoardSquares);
+        debugPrint("VIEW_MODEL setPlay index: $value / currentUserPlay : $currentUserPlay");
+        opponnetThinking = false;
+        isGameTerminated = _gameRule.isGameTerminated;
+        if (isGameTerminated) {
+          if (_gameRule.winnerPlayer == 2) {
+          opponentScore++;
+          var label = "OPPONENT WON";
+          winner = label;
+          debugPrint(label);
+          } else if (_gameRule.isGameDraw) {
+            debugPrint("GAME DRAW");
+          } else {
+            debugPrint("STATE NOT MAPPED");
+          }
+        }
+      });
+    }
   }
 
   @action
   void resetGame() {
      _gameRule.reset();
-
     userBoardState.clear();
     oponentBoardState.clear();
     isGameTerminated = false;

@@ -45,6 +45,24 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
     });
   }
 
+  late final _$opponnetThinkingAtom = Atom(
+    name: 'HomeViewModelState.opponnetThinking',
+    context: context,
+  );
+
+  @override
+  bool get opponnetThinking {
+    _$opponnetThinkingAtom.reportRead();
+    return super.opponnetThinking;
+  }
+
+  @override
+  set opponnetThinking(bool value) {
+    _$opponnetThinkingAtom.reportWrite(value, super.opponnetThinking, () {
+      super.opponnetThinking = value;
+    });
+  }
+
   late final _$currentUserPlayAtom = Atom(
     name: 'HomeViewModelState.currentUserPlay',
     context: context,
@@ -117,22 +135,20 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
     });
   }
 
-  late final _$HomeViewModelStateActionController = ActionController(
-    name: 'HomeViewModelState',
+  late final _$setPlayAsyncAction = AsyncAction(
+    'HomeViewModelState.setPlay',
     context: context,
   );
 
   @override
-  void setPlay({required int index}) {
-    final _$actionInfo = _$HomeViewModelStateActionController.startAction(
-      name: 'HomeViewModelState.setPlay',
-    );
-    try {
-      return super.setPlay(index: index);
-    } finally {
-      _$HomeViewModelStateActionController.endAction(_$actionInfo);
-    }
+  Future<dynamic> setPlay({required int index}) {
+    return _$setPlayAsyncAction.run(() => super.setPlay(index: index));
   }
+
+  late final _$HomeViewModelStateActionController = ActionController(
+    name: 'HomeViewModelState',
+    context: context,
+  );
 
   @override
   void resetGame() {
@@ -151,6 +167,7 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
     return '''
 playerScore: ${playerScore},
 opponentScore: ${opponentScore},
+opponnetThinking: ${opponnetThinking},
 currentUserPlay: ${currentUserPlay},
 isGameTerminated: ${isGameTerminated},
 userBoardState: ${userBoardState},
