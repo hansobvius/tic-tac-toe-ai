@@ -30,12 +30,6 @@ class GameRule {
       currentUserPlay = false;
       checkWinner();
     } 
-    // else if (!currentUserPlay && !_gameModel.selectedBoardSquares.contains(index)) {
-    //   _gameModel.secondBoardSquares.add(index);
-    //   _gameModel.selectedBoardSquares.add(index);
-    //   currentUserPlay = true;
-    //   checkWinner();
-    // }
   }
 
   Future<int> opponentPlay(List<int> opponnetBoardIndicies) async {
