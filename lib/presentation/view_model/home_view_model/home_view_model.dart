@@ -19,6 +19,14 @@ abstract class HomeViewModelState with Store {
 
   // Exposed for UI if needed, but logic is in specific board states
   List<int> get gameSelectedIndex => _gameRule.gameModel.selectedBoardSquares;
+
+  String winner = "";
+
+  @observable
+  int playerScore = 0;
+
+  @observable
+  int opponentScore = 0;
   
   @observable
   bool currentUserPlay = true;
@@ -37,7 +45,7 @@ abstract class HomeViewModelState with Store {
     debugPrint("VIEW_MODEL setPlay index: $index / currentUserPlay : $currentUserPlay");
 
     /// If the index selected already included into game list, the method skips
-    if (gameSelectedIndex.contains(index)) return;
+
     
     _gameRule.play(index);
     
@@ -53,15 +61,31 @@ abstract class HomeViewModelState with Store {
     
     if (isGameTerminated) {
         if (_gameRule.winnerPlayer == 1) { 
-            debugPrint("USER WON");
+          playerScore++;
+          var label = "USER WON";
+          winner = label;
+          debugPrint(label);
         } else if (_gameRule.winnerPlayer == 2) {
-             debugPrint("OPPONENT WON");
+          opponentScore++;
+          var label = "OPPONENT WON";
+          winner = label;
+          debugPrint(label);
         } else if (_gameRule.isGameDraw) {
           debugPrint("GAME DRAW");
         } else {
           debugPrint("STATE NOT MAPPED");
         }
     }
+  }
+
+  @action
+  void resetGame() {
+     _gameRule.reset();
+
+    userBoardState.clear();
+    oponentBoardState.clear();
+    isGameTerminated = false;
+    winner = "";
   }
 
   String getSymbol(int index) {

@@ -3,7 +3,9 @@ import 'package:tic_tac_toe/domain/game_logic/game_victory_condition.dart';
 
 class GameRule {
   
-  var gameModel = GameModel();
+  GameModel _gameModel = GameModel();
+
+  GameModel get gameModel => _gameModel;
   
   bool currentUserPlay = true;
 
@@ -17,38 +19,39 @@ class GameRule {
   void play(int index) {
     if (isGameTerminated) return;
 
-    if (currentUserPlay && !gameModel.selectedBoardSquares.contains(index)) {
-      gameModel.firstBoardSquares.add(index);
-      gameModel.selectedBoardSquares.add(index);
+    if (currentUserPlay && !_gameModel.selectedBoardSquares.contains(index)) {
+      _gameModel.firstBoardSquares.add(index);
+      _gameModel.selectedBoardSquares.add(index);
       currentUserPlay = false;
       checkWinner();
-    } else if (!currentUserPlay && !gameModel.selectedBoardSquares.contains(index)) {
-      gameModel.secondBoardSquares.add(index);
-      gameModel.selectedBoardSquares.add(index);
+    } else if (!currentUserPlay && !_gameModel.selectedBoardSquares.contains(index)) {
+      _gameModel.secondBoardSquares.add(index);
+      _gameModel.selectedBoardSquares.add(index);
       currentUserPlay = true;
       checkWinner();
     }
   }
 
   void checkWinner() {
-    if (hasWinnerNumbers(gameModel.firstBoardSquares)) {
+    if (hasWinnerNumbers(_gameModel.firstBoardSquares)) {
       isGameTerminated = true;
       winnerPlayer = 1;
       // Ideally update wins in GameModel here if needed, but for now just marking termination
     }
     
-    if (hasWinnerNumbers(gameModel.secondBoardSquares)) {
+    if (hasWinnerNumbers(_gameModel.secondBoardSquares)) {
        isGameTerminated = true;
        winnerPlayer = 2;
     }
 
-    if (gameModel.selectedBoardSquares.length == 9) {
+    if (_gameModel.selectedBoardSquares.length == 9) {
       isGameTerminated = true;
       isGameDraw = true;
     }
   }
 
   void reset() {
+    _gameModel = GameModel();
     isGameTerminated = false;
     currentUserPlay = true;
     winnerPlayer = null;
