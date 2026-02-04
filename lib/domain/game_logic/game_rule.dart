@@ -38,14 +38,14 @@ class GameRule {
     // }
   }
 
-  Future opponentPlay(List<int> opponnetBoardIndicies) async {
+  Future<int> opponentPlay(List<int> opponnetBoardIndicies) async {
     var index = await _aiRepositoryImpl.getNextMove(
       _gameModel.selectedBoardSquares, opponnetBoardIndicies);
     _gameModel.secondBoardSquares.add(index);
     _gameModel.selectedBoardSquares.add(index);
     currentUserPlay = true;
     checkWinner();
-    return;
+    return index;
   }
 
   void checkWinner() {

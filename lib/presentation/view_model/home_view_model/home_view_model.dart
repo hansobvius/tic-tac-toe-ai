@@ -67,25 +67,33 @@ abstract class HomeViewModelState with Store {
           var label = "USER WON";
           winner = label;
           debugPrint(label);
-        } else if (_gameRule.winnerPlayer == 2) {
-          opponentScore++;
-          var label = "OPPONENT WON";
-          winner = label;
-          debugPrint(label);
         } else if (_gameRule.isGameDraw) {
           debugPrint("GAME DRAW");
         } else {
           debugPrint("STATE NOT MAPPED");
         }
     }
-
-    if (!_gameRule.currentUserPlay) {
+    else if (!_gameRule.currentUserPlay) {
       opponnetThinking = true;
-      await _gameRule.opponentPlay(oponentBoardState).then((_) {
+      await _gameRule.opponentPlay(oponentBoardState).then((value) {
         oponentBoardState
             ..clear()
             ..addAll(_gameRule.gameModel.secondBoardSquares);
+        debugPrint("VIEW_MODEL setPlay index: $value / currentUserPlay : $currentUserPlay");
         opponnetThinking = false;
+        isGameTerminated = _gameRule.isGameTerminated;
+        if (isGameTerminated) {
+          if (_gameRule.winnerPlayer == 2) {
+          opponentScore++;
+          var label = "OPPONENT WON";
+          winner = label;
+          debugPrint(label);
+          } else if (_gameRule.isGameDraw) {
+            debugPrint("GAME DRAW");
+          } else {
+            debugPrint("STATE NOT MAPPED");
+          }
+        }
       });
     }
   }
