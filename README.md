@@ -67,7 +67,14 @@ docker exec -it tic_tac_toe_ollama ollama pull llama3
 
 > **Note**: This download might take a few minutes depending on your internet connection.
 
-### 3. Verify Connection
+### 3. Open WebUI (Optional)
+The project also includes **Open WebUI**, a user-friendly interface to interact with your local LLMs. It is automatically started with the docker-compose command.
+
+- **URL**: [http://localhost:3000](http://localhost:3000)
+- **Features**: Chat interface, model management, and more.
+- **Setup**: On the first visit, you may be asked to create an admin account. Since this is running locally, you can use any credentials.
+
+### 4. Verify Connection
 You can verify that Ollama is running by visiting [http://localhost:11434](http://localhost:11434) in your browser. You should see the message "Ollama is running".
 
 ## Running the App
