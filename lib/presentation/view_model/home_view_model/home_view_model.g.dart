@@ -135,6 +135,18 @@ mixin _$HomeViewModel on HomeViewModelState, Store {
   }
 
   @override
+  void resetGame() {
+    final _$actionInfo = _$HomeViewModelStateActionController.startAction(
+      name: 'HomeViewModelState.resetGame',
+    );
+    try {
+      return super.resetGame();
+    } finally {
+      _$HomeViewModelStateActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 playerScore: ${playerScore},
