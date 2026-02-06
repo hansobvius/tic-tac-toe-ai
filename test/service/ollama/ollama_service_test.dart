@@ -10,7 +10,7 @@ void main() {
       // We pass the baseUrl directly to avoid needing to load .env in the test environment
       ollamaService = OllamaService(
         modelName: 'llama3',
-        baseUrl: 'http://localhost:11434/api/generate',
+        baseUri: 'http://localhost:11434',
       );
     });
 

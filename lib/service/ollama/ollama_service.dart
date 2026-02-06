@@ -1,22 +1,23 @@
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class OllamaService {
-  final String _baseUrl;
+  final String _baseUri;
   final String modelName;
 
-  OllamaService({this.modelName = 'llama3', String? baseUrl})
-      : _baseUrl = baseUrl ??
-            'http://localhost:${dotenv.env['PORT'] ?? '11434'}/api/generate';
+  OllamaService({this.modelName = 'llama3', String? baseUri})
+      : _baseUri = baseUri ??
+            'http://localhost:${dotenv.env['PORT'] ?? '11434'}';
 
-
-  Future<(int?, String?)> getNextMove(List<int> boardState, List<int> yourMoves) async {
+  Future<(int?, String?)> getNextMove(List<int> boardState, List<int> yourMoves,
+      {bool isRetry = false}) async {
     final prompt = _generatePrompt(boardState, yourMoves);
-    
+
     try {
       final response = await http.post(
-        Uri.parse(_baseUrl),
+        Uri.parse('$_baseUri/api/generate'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'model': modelName,
@@ -31,19 +32,56 @@ class OllamaService {
         if (jsonResponse.containsKey('response')) {
           final responseText = jsonResponse['response'];
           try {
-             final move = _parseMove(responseText);
-             return (move, null);
+            final move = _parseMove(responseText);
+            return (move, null);
           } catch (e) {
-             return (null, 'Failed to parse AI response: $responseText');
+            return (null, 'Failed to parse AI response: $responseText');
           }
         }
         return (null, 'Key "response" not found in JSON');
-
+      } else if (response.statusCode == 404 && !isRetry) {
+        // Model not found, try to pull it
+        debugPrint('Model $modelName not found. Attempting to pull...');
+        final pullSuccess = await _pullModel();
+        if (pullSuccess) {
+          debugPrint('Model pulled successfully. Retrying move...');
+          return getNextMove(boardState, yourMoves, isRetry: true);
+        } else {
+          return (null, 'Model not found and failed to pull $modelName.');
+        }
       } else {
-        return (null, 'Failed to get move from Ollama: ${response.statusCode} - ${response.body}');
+        return (
+          null,
+          'Failed to get move from Ollama: ${response.statusCode} - ${response.body}'
+        );
       }
     } catch (e) {
       return (null, 'Error communicating with Ollama: $e');
+    }
+  }
+
+  Future<bool> _pullModel() async {
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$_baseUri/api/pull'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'name': modelName,
+              'stream': false,
+            }),
+          )
+          .timeout(const Duration(minutes: 30)); // Large timeout for downloading
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        debugPrint('Failed to pull model: ${response.body}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Error pulling model: $e');
+      return false;
     }
   }
 
