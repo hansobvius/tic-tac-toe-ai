@@ -2,8 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:tic_tac_toe/domain/service/base_service.dart';
 
-class OllamaService {
+class OllamaService extends BaseService{
   final String _baseUri;
   final String modelName;
 

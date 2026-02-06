@@ -77,6 +77,35 @@ The project also includes **Open WebUI**, a user-friendly interface to interact 
 ### 4. Verify Connection
 You can verify that Ollama is running by visiting [http://localhost:11434](http://localhost:11434) in your browser. You should see the message "Ollama is running".
 
+### Useful Docker Ollama Commands
+
+Here are some common commands to manage your Ollama instance running in Docker:
+
+**List installed models**
+```bash
+docker exec -it tic_tac_toe_ollama ollama list
+```
+
+**Pull a new model**
+```bash
+docker exec -it tic_tac_toe_ollama ollama pull <model_name>
+```
+
+**Run a model interactively**
+```bash
+docker exec -it tic_tac_toe_ollama ollama run <model_name>
+```
+
+**Remove a model**
+```bash
+docker exec -it tic_tac_toe_ollama ollama rm <model_name>
+```
+
+**Check running models**
+```bash
+docker exec -it tic_tac_toe_ollama ollama ps
+```
+
 ## Running the App
 
 Once the AI service is running and the model is pulled, you can start the Flutter application:
