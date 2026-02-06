@@ -1,16 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tic_tac_toe/service/ollama/ollama_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() {
   group('OllamaService Integration Test', () {
     late OllamaService ollamaService;
 
     setUp(() async {
+      // Load environment variables for BaseService using loadFromString to properly initialize dotenv
+      dotenv.loadFromString(envString: '''
+BASE_URL=http://localhost
+PORT=11434
+''');
+      
       // Ensure you have this model pulled in your local ollama: `ollama pull llama3`
-      // We pass the baseUrl directly to avoid needing to load .env in the test environment
       ollamaService = OllamaService(
         modelName: 'llama3',
-        baseUri: 'http://localhost:11434',
       );
     });
 
