@@ -7,5 +7,5 @@ abstract class AiRepository {
   /// 2 represents Player 2 (AI).
   /// 
   /// Returns the index (0-8) of the move the AI wants to make.
-  Future<int> getNextMove(List<int> boardState, List<int> yourMoves);
+  Future<(int?, String?)> getNextMove(List<int> boardState, List<int> yourMoves);
 }

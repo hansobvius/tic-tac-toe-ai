@@ -42,13 +42,14 @@ abstract class HomeViewModelState with Store {
 
   @observable
   ObservableList<int> oponentBoardState = ObservableList<int>();
+  
+  @observable
+  String? errorMessage;
 
   @action
   Future setPlay({required int index}) async {
-    debugPrint("VIEW_MODEL setPlay index: $index / currentUserPlay : $currentUserPlay");
 
     /// If the index selected already included into game list, the method skips
-    
     _gameRule.play(index);
     
     // Sync state
@@ -75,11 +76,17 @@ abstract class HomeViewModelState with Store {
     }
     else if (!_gameRule.currentUserPlay) {
       opponnetThinking = true;
-      await _gameRule.opponentPlay(oponentBoardState).then((value) {
+      errorMessage = null; // Reset error before new attempt
+      final (isError, error) = await _gameRule.opponentPlay(oponentBoardState);
+      
+      if (isError) {
+        opponnetThinking = false;
+        errorMessage = error;
+        debugPrint("HOME_VIEW_MODEL: AI Error occurred: $error");
+      } else {
         oponentBoardState
             ..clear()
             ..addAll(_gameRule.gameModel.secondBoardSquares);
-        debugPrint("VIEW_MODEL setPlay index: $value / currentUserPlay : $currentUserPlay");
         opponnetThinking = false;
         isGameTerminated = _gameRule.isGameTerminated;
         if (isGameTerminated) {
@@ -89,12 +96,14 @@ abstract class HomeViewModelState with Store {
           winner = label;
           debugPrint(label);
           } else if (_gameRule.isGameDraw) {
-            debugPrint("GAME DRAW");
+            var label = "GAME DRAW";
+            winner = label;
+            debugPrint(label);
           } else {
             debugPrint("STATE NOT MAPPED");
           }
         }
-      });
+      }
     }
   }
 
@@ -105,6 +114,7 @@ abstract class HomeViewModelState with Store {
     oponentBoardState.clear();
     isGameTerminated = false;
     winner = "";
+    errorMessage = null;
   }
 
   String getSymbol(int index) {

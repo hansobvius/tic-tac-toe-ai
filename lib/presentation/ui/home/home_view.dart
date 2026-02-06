@@ -167,6 +167,41 @@ class HomeView extends StatelessWidget {
                     ),
                   );
                 }
+
+                if (viewModel.errorMessage != null) {
+                  return Container(
+                    color: Colors.black38,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(viewModel.errorMessage!,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              )
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          ElevatedButton(
+                            onPressed: viewModel.resetGame,
+                            child: const Text('OK'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
                 return SizedBox();
               }),
           ],

@@ -1,4 +1,6 @@
-import 'package:tic_tac_toe/data/repository/ai_repository_impl.dart';
+import 'package:flutter/foundation.dart';
+
+
 import 'package:tic_tac_toe/dependency_injection/dependency.dart';
 import 'package:tic_tac_toe/domain/entities/game_model.dart';
 import 'package:tic_tac_toe/domain/game_logic/game_victory_condition.dart';
@@ -6,7 +8,7 @@ import 'package:tic_tac_toe/domain/repository/ai_repository.dart';
 
 class GameRule {
 
-  final AiRepositoryImpl _aiRepositoryImpl = DependencyInjection().aiRepositoryImpl;
+  final AiRepository _aiRepository = DependencyInjection().aiRepositoryImpl;
   
   GameModel _gameModel = GameModel();
 
@@ -24,6 +26,8 @@ class GameRule {
   void play(int index) {
     if (isGameTerminated) return;
 
+    debugPrint("VIEW_MODEL play index: $index / currentUserPlay : $currentUserPlay");
+
     if (currentUserPlay && !_gameModel.selectedBoardSquares.contains(index)) {
       _gameModel.firstBoardSquares.add(index);
       _gameModel.selectedBoardSquares.add(index);
@@ -32,14 +36,30 @@ class GameRule {
     } 
   }
 
-  Future<int> opponentPlay(List<int> opponnetBoardIndicies) async {
-    var index = await _aiRepositoryImpl.getNextMove(
-      _gameModel.selectedBoardSquares, opponnetBoardIndicies);
-    _gameModel.secondBoardSquares.add(index);
-    _gameModel.selectedBoardSquares.add(index);
-    currentUserPlay = true;
-    checkWinner();
-    return index;
+   Future<(bool, String?)> opponentPlay(List<int> opponnetBoardIndicies) async {
+    final (index, error) = await _aiRepository.getNextMove(
+      _gameModel.selectedBoardSquares, opponnetBoardIndicies);       
+    
+    if (error != null) {
+      debugPrint("OLLAMA ERROR: $error");
+      return (true, error);
+    }
+
+    if (index != null) {
+      debugPrint("VIEW_MODEL opponentPlay index: $index / currentUserPlay : $currentUserPlay");
+
+      if (_gameModel.selectedBoardSquares.contains(index)) {
+         // Recursive retry might be dangerous if AI keeps sending bad moves, 
+         // but keeping original logic structure for now.
+         return await opponentPlay(opponnetBoardIndicies); 
+      }
+
+      _gameModel.secondBoardSquares.add(index);
+      _gameModel.selectedBoardSquares.add(index);
+      currentUserPlay = true;
+      checkWinner();
+    }
+    return (false, null);
   }
 
   void checkWinner() {

@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:tic_tac_toe/data/repository/ai_repository_impl.dart';
 import 'package:tic_tac_toe/domain/game_logic/game_rule.dart';
 import 'package:tic_tac_toe/presentation/view_model/home_view_model/home_view_model.dart';
-import 'package:tic_tac_toe/service/ollama/ollama_service.dart';
+import 'package:tic_tac_toe/data/datasources/ollama/ollama_service.dart';
 
 /// Service Locator for managing app dependencies.
 class DependencyInjection {
