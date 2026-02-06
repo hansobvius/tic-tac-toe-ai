@@ -1,7 +1,7 @@
 
 
 import '../../domain/repository/ai_repository.dart';
-import '../../service/ollama/ollama_service.dart';
+import '../datasources/ollama/ollama_service.dart';
 
 class AiRepositoryImpl implements AiRepository {
   final OllamaService _ollamaService;

@@ -1,6 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
 import 'package:tic_tac_toe/core/network/network_client.dart';
 
 class OllamaService extends NetworkClient{

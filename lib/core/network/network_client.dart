@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:tic_tac_toe/domain/service/interface_service.dart';
+import 'package:tic_tac_toe/core/network/network_interface.dart';
 
-abstract class BaseService implements InterfaceService {
+abstract class NetworkClient implements NetworkInterface {
   
   @override
   Future<(Map<String, dynamic>? map, int statusCode, String? message)> post({

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tic_tac_toe/service/ollama/ollama_service.dart';
+import 'package:tic_tac_toe/data/datasources/ollama/ollama_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() {

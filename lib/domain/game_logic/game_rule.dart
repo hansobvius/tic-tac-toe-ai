@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import 'package:tic_tac_toe/data/repository/ai_repository_impl.dart';
+
 import 'package:tic_tac_toe/dependency_injection/dependency.dart';
 import 'package:tic_tac_toe/domain/entities/game_model.dart';
 import 'package:tic_tac_toe/domain/game_logic/game_victory_condition.dart';
@@ -8,7 +8,7 @@ import 'package:tic_tac_toe/domain/repository/ai_repository.dart';
 
 class GameRule {
 
-  final AiRepositoryImpl _aiRepositoryImpl = DependencyInjection().aiRepositoryImpl;
+  final AiRepository _aiRepository = DependencyInjection().aiRepositoryImpl;
   
   GameModel _gameModel = GameModel();
 
@@ -37,7 +37,7 @@ class GameRule {
   }
 
    Future<(bool, String?)> opponentPlay(List<int> opponnetBoardIndicies) async {
-    final (index, error) = await _aiRepositoryImpl.getNextMove(
+    final (index, error) = await _aiRepository.getNextMove(
       _gameModel.selectedBoardSquares, opponnetBoardIndicies);       
     
     if (error != null) {
