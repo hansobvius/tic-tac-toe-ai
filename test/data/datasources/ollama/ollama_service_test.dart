@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tic_tac_toe/data/datasources/ollama/ollama_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
