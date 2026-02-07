@@ -12,13 +12,30 @@ A modern Tic Tac Toe implementation in Flutter that allows users to play against
 
 ## Project Structure
 
-The project follows a standard Clean Architecture layout within the `lib/` directory:
+The project follows Clean Architecture principles within the `lib/` directory:
 
-- `domain/`: Business logic, entities, and use cases.
-- `data/`: Data sources, repositories, and detailed implementations.
-- `presentation/`: UI components, screens, and ViewModels (MobX).
-- `service/`: External service integrations, including the `OllamaService`.
-- `dependency_injection/`: Dependency injection setup.
+- **`core/`**: Core infrastructure and shared utilities.
+  - `network/`: Network layer with `NetworkClient` and `NetworkInterface` for HTTP communication.
+  - `resources/`: App-wide resources such as themes, colors, and constants.
+  
+- **`data/`**: Data layer implementation.
+  - `datasources/`: External data sources, including the Ollama AI integration.
+  - `repository/`: Repository implementations that bridge domain and data layers.
+  
+- **`domain/`**: Business logic and domain models.
+  - `entities/`: Domain entities and models.
+  - `game_logic/`: Game rules and logic.
+  - `repository/`: Repository interfaces (contracts).
+  
+- **`presentation/`**: UI and state management.
+  - `ui/`: Screens and UI components.
+  - `view_model/`: MobX ViewModels for state management.
+  - `routes/`: App navigation and routing.
+  
+- **`service/`**: High-level service integrations for external systems.
+  - `ollama/`: Ollama AI service integration.
+  
+- **`dependency_injection/`**: Dependency injection setup and service locator configuration.
 
 ## Prerequisites
 
