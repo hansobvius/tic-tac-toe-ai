@@ -9,7 +9,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',  
+      title: 'Tic Tac Toe AI',  
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -17,6 +17,28 @@ class App extends StatelessWidget {
       ),
       initialRoute: Routes.home,
       routes: Routes.routes,
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth > 800) {
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 450,
+                    maxHeight: 850,
+                  ),
+                  child: MediaQuery.withNoTextScaling(
+                    child: child!,
+                  ),
+                ),
+              );
+            }
+            return MediaQuery.withNoTextScaling(
+              child: child!,
+            );
+          },
+        );
+      },
     );
   }
 }
