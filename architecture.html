@@ -732,19 +732,19 @@
         <div class="solid-desc">
           Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de <strong>abstrações</strong>. Abstrações não devem depender de detalhes — detalhes dependem de abstrações.
         </div>
-        <div class="two-col">
+        <div class="solid-status ok">
+          <span class="status-icon">✅</span>
+          <span>No projeto: <strong>Corrigido!</strong> <code>GameRule</code> e <code>HomeViewModel</code> agora recebem suas dependências via construtor. O <code>DependencyInjection</code> (Composition Root) monta o grafo e expõe apenas abstrações (<code>AiRepository</code>).</span>
+        </div>
+        <div class="two-col" style="margin-top: 16px;">
           <div>
-            <pre><span class="com">// ❌ VIOLAÇÃO no GameRule (domain)</span>
+            <pre><span class="com">// ❌ ANTES — violação DIP</span>
 <span class="bad"><span class="kw">final</span> AiRepository _aiRepo =
   <span class="cl">DependencyInjection</span>()
-    .aiRepositoryImpl; <span class="com">// busca concreta!</span></span></pre>
-            <div class="solid-status bad">
-              <span class="status-icon">❌</span>
-              <span>Domain acessa o service locator e busca a implementação concreta. Isso <strong>inverte</strong> a inversão de dependência.</span>
-            </div>
+    .aiRepositoryImpl; <span class="com">// domain → DI</span></span></pre>
           </div>
           <div>
-            <pre><span class="com">// ✅ CORRETO — injeção via construtor</span>
+            <pre><span class="com">// ✅ DEPOIS — injeção via construtor</span>
 <span class="good"><span class="kw">class</span> <span class="cl">GameRule</span> {
   <span class="kw">final</span> AiRepository _aiRepo;
 
@@ -752,7 +752,7 @@
     <span class="kw">required</span> AiRepository repo
   }) : _aiRepo = repo;
 }</span></pre>
-            </div>
+          </div>
         </div>
       </div>
 
@@ -795,8 +795,8 @@
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:12px 16px;"><code>game_rule.dart</code></td>
             <td style="padding:12px 16px;"><span style="color:var(--green)">Domain / Use Case</span></td>
-            <td style="padding:12px 16px; color:var(--text-muted)">Orquestra as regras do jogo. Deveria receber dependências via construtor.</td>
-            <td style="padding:12px 16px; color:var(--accent4);">⚠️ Violação DIP</td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Orquestra as regras do jogo. Recebe <code>AiRepository</code> via construtor.</td>
+            <td style="padding:12px 16px;">✅ Corrigido</td>
           </tr>
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:12px 16px;"><code>game_victory_condition.dart</code></td>
@@ -825,14 +825,14 @@
           <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:12px 16px;"><code>home_view_model.dart</code></td>
             <td style="padding:12px 16px;"><span style="color:var(--accent4)">Presentation / ViewModel</span></td>
-            <td style="padding:12px 16px; color:var(--text-muted)">Estado reativo com MobX. Busca seu próprio GameRule internamente.</td>
-            <td style="padding:12px 16px; color:var(--accent4);">⚠️ Violação DIP</td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Estado reativo com MobX. Recebe <code>GameRule</code> via construtor.</td>
+            <td style="padding:12px 16px;">✅ Corrigido</td>
           </tr>
           <tr>
             <td style="padding:12px 16px;"><code>dependency.dart</code></td>
             <td style="padding:12px 16px;"><span style="color:#a89eff">DI / Composition Root</span></td>
-            <td style="padding:12px 16px; color:var(--text-muted)">Singleton que monta o grafo de dependências. Expõe concretas em vez de abstrações.</td>
-            <td style="padding:12px 16px; color:var(--accent4);">⚠️ Expõe concretas</td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Composition Root que monta o grafo de dependências. Expõe abstrações.</td>
+            <td style="padding:12px 16px;">✅ Corrigido</td>
           </tr>
         </tbody>
       </table>
@@ -875,46 +875,42 @@
         </div>
       </div>
 
-      <div class="finding bad">
-        <div class="finding-icon">❌</div>
+      <div class="finding ok">
+        <div class="finding-icon">✅</div>
         <div>
-          <div class="finding-title">GameRule acessa DependencyInjection internamente <span class="rule-tag">DIP</span></div>
+          <div class="finding-title">GameRule recebe dependências via construtor <span class="rule-tag">DIP</span></div>
           <div class="finding-desc">
-            <code>GameRule</code> (domain) instancia <code>DependencyInjection().aiRepositoryImpl</code> direto no campo. Isso viola tanto o DIP quanto a Dependency Rule da Clean Architecture — o domain não pode depender da camada de injeção.
-            <pre style="margin-top:10px;">
-<span class="bad"><span class="kw">final</span> AiRepository _aiRepo =
-  <span class="cl">DependencyInjection</span>().aiRepositoryImpl; <span class="com">// ❌ domain → DI</span></span>
-<span class="good"><span class="kw">final</span> AiRepository _aiRepo;           <span class="com">// ✅ receba via construtor</span></span></pre>
+            <strong>Corrigido!</strong> <code>GameRule</code> agora recebe <code>AiRepository</code> via construtor, sem conhecer a camada de DI. O domain ficou completamente independente.
           </div>
         </div>
       </div>
 
-      <div class="finding bad">
-        <div class="finding-icon">❌</div>
+      <div class="finding ok">
+        <div class="finding-icon">✅</div>
         <div>
-          <div class="finding-title">HomeViewModel acessa DependencyInjection internamente <span class="rule-tag">DIP</span></div>
+          <div class="finding-title">HomeViewModel recebe dependências via construtor <span class="rule-tag">DIP</span></div>
           <div class="finding-desc">
-            Mesmo problema: <code>HomeViewModelState</code> busca <code>DependencyInjection().gameRule</code> ao invés de receber a dependência injetada. Isso torna o ViewModel impossível de testar de forma isolada.
+            <strong>Corrigido!</strong> <code>HomeViewModelState</code> agora recebe <code>GameRule</code> via construtor. A presentation não acessa mais o service locator diretamente, tornando-se testável de forma isolada.
           </div>
         </div>
       </div>
 
-      <div class="finding bad">
-        <div class="finding-icon">❌</div>
+      <div class="finding ok">
+        <div class="finding-icon">✅</div>
         <div>
-          <div class="finding-title">DependencyInjection expõe implementações concretas <span class="rule-tag">DIP</span></div>
+          <div class="finding-title">DependencyInjection expõe abstrações <span class="rule-tag">DIP</span></div>
           <div class="finding-desc">
-            <code>late final AiRepositoryImpl aiRepositoryImpl</code> deveria ser <code>late final AiRepository aiRepository</code>. Expor concretas força todos os consumidores a conhecer os detalhes de implementação.
+            <strong>Corrigido!</strong> O Composition Root agora expõe <code>AiRepository</code> (abstração) em vez de <code>AiRepositoryImpl</code> (concreta). Monta o grafo e empurra via construtor.
           </div>
         </div>
       </div>
 
-      <div class="finding bad">
-        <div class="finding-icon">❌</div>
+      <div class="finding ok">
+        <div class="finding-icon">✅</div>
         <div>
-          <div class="finding-title">OllamaService duplicado — código morto em lib/service/ <span class="rule-tag">SRP</span></div>
+          <div class="finding-title">OllamaService duplicado removido <span class="rule-tag">SRP</span></div>
           <div class="finding-desc">
-            Existe uma cópia idêntica do <code>OllamaService</code> em <code>lib/service/ollama/</code> que nunca é importada. A pasta <code>service/</code> não tem papel definido na arquitetura e deve ser removida.
+            <strong>Corrigido!</strong> A pasta <code>lib/service/</code> com o código morto foi removida. Apenas o <code>OllamaService</code> em <code>data/datasources/</code> permanece.
           </div>
         </div>
       </div>
@@ -964,31 +960,29 @@
 
     <div class="score-grid">
       <div class="score-card score-ok">
-        <div class="score-num">3</div>
+        <div class="score-num">7</div>
         <div class="score-label">✅ Pontos corretos</div>
       </div>
       <div class="score-card score-warn">
         <div class="score-num">3</div>
-        <div class="score-label">⚠️ Melhorias necessárias</div>
+        <div class="score-label">⚠️ Melhorias pendentes</div>
       </div>
       <div class="score-card score-bad">
-        <div class="score-num">4</div>
+        <div class="score-num">0</div>
         <div class="score-label">❌ Violações críticas</div>
       </div>
       <div class="score-card" style="border-color: rgba(108,99,255,0.3);">
-        <div class="score-num" style="color: var(--accent);">~45%</div>
+        <div class="score-num" style="color: var(--green);">~75%</div>
         <div class="score-label">Conformidade geral estimada</div>
       </div>
     </div>
 
     <div class="card" style="margin-top: 28px;">
-      <h3 style="margin-bottom:16px;">🎯 Prioridade de Correção</h3>
+      <h3 style="margin-bottom:16px;">🎯 Melhorias restantes</h3>
       <ol style="padding-left: 20px; display: grid; gap: 10px; font-size: 14px; color: var(--text-muted);">
-        <li><strong style="color:var(--text)">Injetar dependências via construtor</strong> em <code>GameRule</code> e <code>HomeViewModel</code> — maior impacto em testabilidade e conformidade DIP</li>
-        <li><strong style="color:var(--text)">Remover <code>lib/service/</code></strong> — pasta com código morto, duplicada sem propósito</li>
-        <li><strong style="color:var(--text)">Expor abstrações no DependencyInjection</strong> — <code>AiRepository</code> em vez de <code>AiRepositoryImpl</code></li>
         <li><strong style="color:var(--text)">Corrigir <code>diagonalFirstCondition</code></strong> — bug funcional (<code>[1,4,8]</code> → <code>[0,4,8]</code>)</li>
         <li><strong style="color:var(--text)">Encapsular constantes de vitória</strong> em uma classe com campos <code>static const</code></li>
+        <li><strong style="color:var(--text)">Separar Use Cases</strong> — dividir <code>GameRule</code> em Use Cases explícitos (<code>PlayMoveUseCase</code>, <code>ResetGameUseCase</code>)</li>
       </ol>
     </div>
   </div>
