@@ -32,9 +32,6 @@ The project follows Clean Architecture principles within the `lib/` directory:
   - `view_model/`: MobX ViewModels for state management.
   - `routes/`: App navigation and routing.
   
-- **`service/`**: High-level service integrations for external systems.
-  - `ollama/`: Ollama AI service integration.
-  
 - **`dependency_injection/`**: Dependency injection setup and service locator configuration.
 
 ## Prerequisites

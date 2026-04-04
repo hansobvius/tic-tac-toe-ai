@@ -1,14 +1,15 @@
 import 'package:flutter/foundation.dart';
 
-
-import 'package:tic_tac_toe/dependency_injection/dependency.dart';
 import 'package:tic_tac_toe/domain/entities/game_model.dart';
 import 'package:tic_tac_toe/domain/game_logic/game_victory_condition.dart';
 import 'package:tic_tac_toe/domain/repository/ai_repository.dart';
 
 class GameRule {
 
-  final AiRepository _aiRepository = DependencyInjection().aiRepositoryImpl;
+  final AiRepository _aiRepository;
+
+  GameRule({required AiRepository aiRepository})
+      : _aiRepository = aiRepository;
   
   GameModel _gameModel = GameModel();
 
