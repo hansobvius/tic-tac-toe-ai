@@ -1,8 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
 
-import 'package:tic_tac_toe/domain/game_logic/game_rule.dart';
-
+import 'package:tic_tac_toe/domain/entities/game_model.dart';
+import 'package:tic_tac_toe/domain/enums/game_status.dart';
+import 'package:tic_tac_toe/domain/enums/player.dart';
+import 'package:tic_tac_toe/domain/usecases/play_move_use_case.dart';
+import 'package:tic_tac_toe/domain/usecases/opponent_play_use_case.dart';
+import 'package:tic_tac_toe/domain/usecases/reset_game_use_case.dart';
+import 'package:tic_tac_toe/domain/value_objects/board_position.dart';
 
 part 'home_view_model.g.dart';
 
@@ -10,17 +15,23 @@ class HomeViewModel = HomeViewModelState with _$HomeViewModel;
 
 abstract class HomeViewModelState with Store {
 
-  final GameRule _gameRule;
+  final PlayMoveUseCase _playMoveUseCase;
+  final OpponentPlayUseCase _opponentPlayUseCase;
+  final ResetGameUseCase _resetGameUseCase;
 
-  HomeViewModelState({required GameRule gameRule})
-      : _gameRule = gameRule;
+  HomeViewModelState({
+    required PlayMoveUseCase playMoveUseCase,
+    required OpponentPlayUseCase opponentPlayUseCase,
+    required ResetGameUseCase resetGameUseCase,
+  })  : _playMoveUseCase = playMoveUseCase,
+        _opponentPlayUseCase = opponentPlayUseCase,
+        _resetGameUseCase = resetGameUseCase;
+
+  GameModel _gameModel = GameModel();
 
   final String userSymbol = 'O';
 
   final String oponentSymbol = 'X';
-
-  // Exposed for UI if needed, but logic is in specific board states
-  List<int> get gameSelectedIndex => _gameRule.gameModel.selectedBoardSquares;
 
   String winner = "";
 
@@ -51,70 +62,67 @@ abstract class HomeViewModelState with Store {
   @action
   Future setPlay({required int index}) async {
 
-    /// If the index selected already included into game list, the method skips
-    _gameRule.play(index);
+    // Execute the player's move via UseCase
+    _gameModel = _playMoveUseCase(BoardPosition(index), _gameModel);
     
-    // Sync state
-    userBoardState
-      ..clear()
-      ..addAll(_gameRule.gameModel.firstBoardSquares);
-    oponentBoardState
-      ..clear()
-      ..addAll(_gameRule.gameModel.secondBoardSquares);
-    currentUserPlay = _gameRule.currentUserPlay;
-    isGameTerminated = _gameRule.isGameTerminated;
-    
-    if (isGameTerminated) {
-        if (_gameRule.winnerPlayer == 1) { 
-          playerScore++;
-          var label = "USER WON";
-          winner = label;
-          debugPrint(label);
-        } else if (_gameRule.isGameDraw) {
-          debugPrint("GAME DRAW");
-        } else {
-          debugPrint("STATE NOT MAPPED");
-        }
+    // Sync UI state
+    _syncBoardState();
+
+    if (_gameModel.status == GameStatus.playerWon) {
+      playerScore++;
+      winner = "USER WON";
+      isGameTerminated = true;
+      debugPrint("USER WON");
+      return;
     }
-    else if (!_gameRule.currentUserPlay) {
+
+    if (_gameModel.status == GameStatus.draw) {
+      winner = "GAME DRAW";
+      isGameTerminated = true;
+      debugPrint("GAME DRAW");
+      return;
+    }
+
+    // If it's now the opponent's turn, execute AI move
+    if (_gameModel.status == GameStatus.playing && 
+        _gameModel.currentPlayer == Player.second) {
       opponnetThinking = true;
-      errorMessage = null; // Reset error before new attempt
-      final (isError, error) = await _gameRule.opponentPlay(oponentBoardState);
-      
-      if (isError) {
-        opponnetThinking = false;
-        errorMessage = error;
-        debugPrint("HOME_VIEW_MODEL: AI Error occurred: $error");
-      } else {
-        oponentBoardState
-            ..clear()
-            ..addAll(_gameRule.gameModel.secondBoardSquares);
-        opponnetThinking = false;
-        isGameTerminated = _gameRule.isGameTerminated;
-        if (isGameTerminated) {
-          if (_gameRule.winnerPlayer == 2) {
-          opponentScore++;
-          var label = "OPPONENT WON";
-          winner = label;
-          debugPrint(label);
-          } else if (_gameRule.isGameDraw) {
-            var label = "GAME DRAW";
-            winner = label;
-            debugPrint(label);
-          } else {
-            debugPrint("STATE NOT MAPPED");
-          }
-        }
+      errorMessage = null;
+
+      final (updatedModel, failure) = await _opponentPlayUseCase(_gameModel);
+      _gameModel = updatedModel;
+
+      opponnetThinking = false;
+
+      if (failure != null) {
+        errorMessage = failure.message;
+        debugPrint("HOME_VIEW_MODEL: AI Error: ${failure.message}");
+        return;
+      }
+
+      // Sync UI state after opponent move
+      _syncBoardState();
+
+      if (_gameModel.status == GameStatus.opponentWon) {
+        opponentScore++;
+        winner = "OPPONENT WON";
+        isGameTerminated = true;
+        debugPrint("OPPONENT WON");
+      } else if (_gameModel.status == GameStatus.draw) {
+        winner = "GAME DRAW";
+        isGameTerminated = true;
+        debugPrint("GAME DRAW");
       }
     }
   }
 
   @action
   void resetGame() {
-     _gameRule.reset();
+    _gameModel = _resetGameUseCase();
     userBoardState.clear();
     oponentBoardState.clear();
     isGameTerminated = false;
+    currentUserPlay = true;
     winner = "";
     errorMessage = null;
   }
@@ -129,5 +137,17 @@ abstract class HomeViewModelState with Store {
     }
 
     return '';
+  }
+
+  /// Syncs the observable UI lists with the domain model.
+  void _syncBoardState() {
+    userBoardState
+      ..clear()
+      ..addAll(_gameModel.firstBoardSquares);
+    oponentBoardState
+      ..clear()
+      ..addAll(_gameModel.secondBoardSquares);
+    currentUserPlay = _gameModel.currentPlayer == Player.first;
+    isGameTerminated = _gameModel.status != GameStatus.playing;
   }
 }
