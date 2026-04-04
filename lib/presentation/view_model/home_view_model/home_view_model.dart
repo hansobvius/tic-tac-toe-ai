@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:mobx/mobx.dart';
-import 'package:tic_tac_toe/dependency_injection/dependency.dart';
 
 import 'package:tic_tac_toe/domain/game_logic/game_rule.dart';
 
@@ -11,7 +10,10 @@ class HomeViewModel = HomeViewModelState with _$HomeViewModel;
 
 abstract class HomeViewModelState with Store {
 
-  final GameRule _gameRule = DependencyInjection().gameRule;
+  final GameRule _gameRule;
+
+  HomeViewModelState({required GameRule gameRule})
+      : _gameRule = gameRule;
 
   final String userSymbol = 'O';
 
