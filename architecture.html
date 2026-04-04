@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clean Architecture & SOLID — Tic Tac Toe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0f1a;
+      --bg2: #12152a;
+      --bg3: #1a1f38;
+      --border: rgba(255,255,255,0.07);
+      --accent: #6c63ff;
+      --accent2: #00d4ff;
+      --accent3: #ff6b9d;
+      --accent4: #ffd166;
+      --green: #06ffa5;
+      --red: #ff4d6d;
+      --text: #e8eaf6;
+      --text-muted: #7b82a8;
+      --radius: 16px;
+      --glow: 0 0 32px rgba(108,99,255,0.25);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.7;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── Background decoration ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -40%;
+      left: -20%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(108,99,255,0.12) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -30%;
+      right: -10%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Layout ─── */
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── Header ─── */
+    header {
+      padding: 64px 0 48px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(108,99,255,0.15);
+      border: 1px solid rgba(108,99,255,0.35);
+      color: #a89eff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    header p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    /* ─── Nav ─── */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 28px 0;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,15,26,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--text);
+      border-color: var(--border);
+      background: var(--bg3);
+    }
+
+    /* ─── Sections ─── */
+    section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-intro {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin-bottom: 48px;
+    }
+
+    /* ─── Card ─── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(108,99,255,0.3);
+      box-shadow: var(--glow);
+      transform: translateY(-2px);
+    }
+
+    /* ─── Clean Architecture Diagram ─── */
+    .ca-diagram {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 40px 0;
+    }
+
+    .circle-wrapper {
+      position: relative;
+      width: 420px;
+      height: 420px;
+      flex-shrink: 0;
+    }
+
+    .circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
+      transition: transform 0.3s;
+    }
+
+    .circle:hover { transform: translate(-50%, -50%) scale(1.03); }
+
+    .c1 {
+      width: 420px; height: 420px;
+      background: rgba(255,107,157,0.08);
+      border: 2px solid rgba(255,107,157,0.35);
+    }
+    .c2 {
+      width: 320px; height: 320px;
+      background: rgba(255,209,102,0.08);
+      border: 2px solid rgba(255,209,102,0.35);
+    }
+    .c3 {
+      width: 220px; height: 220px;
+      background: rgba(0,212,255,0.08);
+      border: 2px solid rgba(0,212,255,0.35);
+    }
+    .c4 {
+      width: 120px; height: 120px;
+      background: rgba(6,255,165,0.12);
+      border: 2px solid rgba(6,255,165,0.45);
+    }
+
+    .c-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .c-sub {
+      font-size: 9px;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    .c1 .c-label { color: #ff6b9d; position: absolute; top: 16px; }
+    .c1 .c-sub   { color: #ff6b9d; position: absolute; top: 30px; }
+    .c2 .c-label { color: #ffd166; position: absolute; top: 16px; }
+    .c2 .c-sub   { color: #ffd166; position: absolute; top: 30px; }
+    .c3 .c-label { color: var(--accent2); position: absolute; top: 16px; }
+    .c3 .c-sub   { color: var(--accent2); position: absolute; top: 30px; }
+    .c4 .c-label { color: var(--green); font-size: 10px; }
+    .c4 .c-sub   { color: var(--green); font-size: 8px; }
+
+    /* ─── CA Layer cards ─── */
+    .layers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .layer-card {
+      border-radius: var(--radius);
+      padding: 24px;
+      border: 1px solid;
+      background: rgba(255,255,255,0.02);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .layer-card:hover { transform: translateY(-3px); }
+
+    .layer-card.domain   { border-color: rgba(6,255,165,0.3);   box-shadow: 0 0 20px rgba(6,255,165,0.06); }
+    .layer-card.data     { border-color: rgba(0,212,255,0.3);   box-shadow: 0 0 20px rgba(0,212,255,0.06); }
+    .layer-card.pres     { border-color: rgba(255,209,102,0.3); box-shadow: 0 0 20px rgba(255,209,102,0.06); }
+    .layer-card.infra    { border-color: rgba(255,107,157,0.3); box-shadow: 0 0 20px rgba(255,107,157,0.06); }
+
+    .layer-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 8px;
+    }
+    .domain  .layer-dot { background: var(--green); }
+    .data    .layer-dot { background: var(--accent2); }
+    .pres    .layer-dot { background: var(--accent4); }
+    .infra   .layer-dot { background: var(--accent3); }
+
+    .layer-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .domain  .layer-title { color: var(--green); }
+    .data    .layer-title { color: var(--accent2); }
+    .pres    .layer-title { color: var(--accent4); }
+    .infra   .layer-title { color: var(--accent3); }
+
+    .layer-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+
+    .file-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      margin: 3px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #b0b8d8;
+    }
+
+    /* ─── Dependency arrow diagram ─── */
+    .deps-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 40px 0;
+    }
+
+    .dep-box {
+      padding: 14px 20px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      min-width: 120px;
+    }
+
+    .dep-arrow {
+      font-size: 22px;
+      color: var(--text-muted);
+      padding: 0 8px;
+      user-select: none;
+    }
+
+    .dep-box.pres   { background: rgba(255,209,102,0.1); border: 1px solid rgba(255,209,102,0.3); color: var(--accent4); }
+    .dep-box.domain { background: rgba(6,255,165,0.1);   border: 1px solid rgba(6,255,165,0.3);   color: var(--green); }
+    .dep-box.data   { background: rgba(0,212,255,0.1);   border: 1px solid rgba(0,212,255,0.3);   color: var(--accent2); }
+    .dep-box.core   { background: rgba(255,107,157,0.1); border: 1px solid rgba(255,107,157,0.3); color: var(--accent3); }
+    .dep-box.di     { background: rgba(108,99,255,0.1);  border: 1px solid rgba(108,99,255,0.3);  color: #a89eff; }
+
+    /* ─── SOLID ─── */
+    .solid-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .solid-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.25s, transform 0.25s;
+    }
+
+    .solid-card:hover {
+      border-color: rgba(108,99,255,0.4);
+      transform: translateY(-2px);
+    }
+
+    .solid-letter {
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .solid-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .solid-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    .solid-status {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      padding: 14px;
+      border-radius: 10px;
+      line-height: 1.5;
+    }
+
+    .solid-status.ok   { background: rgba(6,255,165,0.06);  color: #8af7cf; border: 1px solid rgba(6,255,165,0.15); }
+    .solid-status.warn { background: rgba(255,209,102,0.06); color: #f0c97a; border: 1px solid rgba(255,209,102,0.15); }
+    .solid-status.bad  { background: rgba(255,77,109,0.06);  color: #f08090; border: 1px solid rgba(255,77,109,0.15); }
+
+    .status-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ─── Code block ─── */
+    pre {
+      background: #080a14;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: 'Fira Code', monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+      margin: 12px 0;
+    }
+
+    .kw   { color: #c792ea; }
+    .cl   { color: #82aaff; }
+    .fn   { color: #82aaff; }
+    .str  { color: #c3e88d; }
+    .com  { color: #546e7a; font-style: italic; }
+    .num  { color: #f78c6c; }
+    .bad  { background: rgba(255,77,109,0.15); border-left: 3px solid var(--red); padding-left: 8px; display: block; }
+    .good { background: rgba(6,255,165,0.07);  border-left: 3px solid var(--green); padding-left: 8px; display: block; }
+
+    /* ─── Issues / Findings ─── */
+    .findings-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .finding {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 16px;
+      align-items: start;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      transition: transform 0.2s;
+    }
+    .finding:hover { transform: translateX(4px); }
+
+    .finding.ok   { border-left: 3px solid var(--green); }
+    .finding.warn { border-left: 3px solid var(--accent4); }
+    .finding.bad  { border-left: 3px solid var(--red); }
+
+    .finding-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .finding.ok   .finding-icon { background: rgba(6,255,165,0.1); }
+    .finding.warn .finding-icon { background: rgba(255,209,102,0.1); }
+    .finding.bad  .finding-icon { background: rgba(255,77,109,0.1); }
+
+    .finding-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+    .finding.ok   .finding-title { color: var(--green); }
+    .finding.warn .finding-title { color: var(--accent4); }
+    .finding.bad  .finding-title { color: #ff7b8a; }
+
+    .finding-desc { font-size: 13px; color: var(--text-muted); line-height: 1.55; }
+
+    /* ─── Score ─── */
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .score-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .score-num {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .score-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .score-ok   .score-num { color: var(--green); }
+    .score-warn .score-num { color: var(--accent4); }
+    .score-bad  .score-num { color: var(--red); }
+
+    /* ─── Footer ─── */
+    footer {
+      text-align: center;
+      padding: 48px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    footer span { color: var(--accent); }
+
+    /* ─── Tooltip definitions ─── */
+    .rule-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      background: rgba(108,99,255,0.15);
+      color: #a89eff;
+      border: 1px solid rgba(108,99,255,0.3);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 680px) { .two-col { grid-template-columns: 1fr; } }
+
+    h3 { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER ═══════════════════════ -->
+<header>
+  <div class="container">
+    <div class="badge">📐 Guia de Arquitetura</div>
+    <h1>Clean Architecture & SOLID</h1>
+    <p>Uma explicação visual aplicada ao projeto <strong>Tic-Tac-Toe Flutter</strong> com IA via Ollama.</p>
+  </div>
+</header>
+
+<!-- ═══════════════════════ NAV ═══════════════════════ -->
+<nav>
+  <a href="#clean-arch">Clean Architecture</a>
+  <a href="#solid">Princípios SOLID</a>
+  <a href="#projeto">No Projeto</a>
+  <a href="#problemas">Problemas</a>
+  <a href="#score">Pontuação</a>
+</nav>
+
+<!-- ═══════════════════════ CLEAN ARCH ═══════════════════════ -->
+<section id="clean-arch">
+  <div class="container">
+    <div class="section-label">Conceito 1</div>
+    <h2>Clean Architecture</h2>
+    <p class="section-intro">
+      Criada por Robert C. Martin ("Uncle Bob"), é uma forma de organizar o software em <strong>camadas concêntricas</strong>, onde o código de alto nível (regras de negócio) não depende de detalhes de infraestrutura como banco de dados, UI ou frameworks externos.
+    </p>
+
+    <!-- Diagrama concêntrico -->
+    <div class="ca-diagram">
+      <div class="circle-wrapper">
+        <div class="circle c1">
+          <span class="c-label">Frameworks & Drivers</span>
+          <span class="c-sub">UI, HTTP, DB, Flutter Widgets</span>
+        </div>
+        <div class="circle c2">
+          <span class="c-label">Interface Adapters</span>
+          <span class="c-sub">ViewModels, Repositories, Controllers</span>
+        </div>
+        <div class="circle c3">
+          <span class="c-label">Use Cases</span>
+          <span class="c-sub">Regras de aplicação</span>
+        </div>
+        <div class="circle c4">
+          <span class="c-label">Entities</span>
+          <span class="c-sub">Regras de negócio</span>
+        </div>
+      </div>
+    </div>
+
+    <h3>🔑 A Regra de Dependência</h3>
+    <p class="section-intro">
+      As dependências do código-fonte devem apontar <strong>somente para dentro</strong>. A camada externa conhece a interna, mas jamais o contrário.
+    </p>
+
+    <div class="deps-flow">
+      <div class="dep-box pres">🎨 Presentation<br/><small>HomeViewModel</small></div>
+      <div class="dep-arrow">→</div>
+      <div class="dep-box domain">🧠 Domain<br/><small>GameRule, AiRepository</small></div>
+      <div class="dep-arrow">←</div>
+      <div class="dep-box data">💾 Data<br/><small>AiRepositoryImpl</small></div>
+      <div class="dep-arrow">→</div>
+      <div class="dep-box core">🌐 Core<br/><small>NetworkClient</small></div>
+    </div>
+    <p style="text-align:center; font-size:12px; color: var(--text-muted); margin-bottom: 32px;">
+      ⚡ O <code>Domain</code> define contratos (interfaces). O <code>Data</code> os implementa. O <code>Domain</code> nunca importa o <code>Data</code>.
+    </p>
+
+    <!-- Layer cards -->
+    <div class="layers-grid">
+      <div class="layer-card domain">
+        <div class="layer-title"><span class="layer-dot"></span>Domain</div>
+        <p>Núcleo da aplicação. Contém entidades e regras de negócio puras. <strong>Zero dependência</strong> de frameworks ou infraestrutura.</p>
+        <div>
+          <span class="file-tag">📄 game_model.dart</span>
+          <span class="file-tag">📄 ai_repository.dart</span>
+          <span class="file-tag">📄 game_rule.dart</span>
+          <span class="file-tag">📄 game_victory_condition.dart</span>
+        </div>
+      </div>
+      <div class="layer-card data">
+        <div class="layer-title"><span class="layer-dot"></span>Data</div>
+        <p>Implementa os contratos do domain. Faz a ponte entre o domain e fontes de dados externas como APIs ou banco.</p>
+        <div>
+          <span class="file-tag">📄 ai_repository_impl.dart</span>
+          <span class="file-tag">📄 ollama_service.dart</span>
+        </div>
+      </div>
+      <div class="layer-card pres">
+        <div class="layer-title"><span class="layer-dot"></span>Presentation</div>
+        <p>Camada de UI e ViewModels. Consome o domain via abstrações. Nunca acessa datasources diretamente.</p>
+        <div>
+          <span class="file-tag">📄 home_view_model.dart</span>
+          <span class="file-tag">📄 app.dart</span>
+          <span class="file-tag">📁 ui/home/</span>
+        </div>
+      </div>
+      <div class="layer-card infra">
+        <div class="layer-title"><span class="layer-dot"></span>Core / Infra</div>
+        <p>Utilitários transversais reutilizáveis por todas as camadas: cliente HTTP, extensões, configurações.</p>
+        <div>
+          <span class="file-tag">📄 network_client.dart</span>
+          <span class="file-tag">📄 network_interface.dart</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SOLID ═══════════════════════ -->
+<section id="solid">
+  <div class="container">
+    <div class="section-label">Conceito 2</div>
+    <h2>Princípios SOLID</h2>
+    <p class="section-intro">
+      Cinco princípios de design orientado a objetos que tornam o código mais <strong>manutenível, extensível e testável</strong>. Cada letra da sigla representa um princípio.
+    </p>
+
+    <div class="solid-grid">
+
+      <!-- S -->
+      <div class="solid-card">
+        <div class="solid-letter">S</div>
+        <div class="solid-name">Single Responsibility Principle</div>
+        <div class="solid-desc">
+          Uma classe deve ter <strong>apenas um motivo para mudar</strong>. Cada classe é responsável por uma única parte da funcionalidade.
+        </div>
+        <div class="solid-status warn">
+          <span class="status-icon">⚠️</span>
+          <span>No projeto: <code>GameRule</code> mistura lógica de negócio (verificar vencedor) com orquestração de fluxo (chamar AI, gerenciar estado). Deveria ser dividida em um <em>Use Case</em> e uma classe de regras puras.</span>
+        </div>
+      </div>
+
+      <!-- O -->
+      <div class="solid-card">
+        <div class="solid-letter">O</div>
+        <div class="solid-name">Open/Closed Principle</div>
+        <div class="solid-desc">
+          Entidades de software devem estar <strong>abertas para extensão</strong>, mas <strong>fechadas para modificação</strong>. Extend, não altere.
+        </div>
+        <div class="solid-status ok">
+          <span class="status-icon">✅</span>
+          <span>No projeto: <code>NetworkClient</code> é uma classe abstrata que pode ser estendida por novos serviços (como <code>OllamaService</code>) sem ser modificada. Bem aplicado.</span>
+        </div>
+      </div>
+
+      <!-- L -->
+      <div class="solid-card">
+        <div class="solid-letter">L</div>
+        <div class="solid-name">Liskov Substitution Principle</div>
+        <div class="solid-desc">
+          Subclasses devem poder <strong>substituir</strong> suas superclasses sem alterar o comportamento esperado do programa.
+        </div>
+        <div class="solid-status ok">
+          <span class="status-icon">✅</span>
+          <span>No projeto: <code>AiRepositoryImpl implements AiRepository</code>. Qualquer lugar que usa <code>AiRepository</code> pode receber <code>AiRepositoryImpl</code> sem quebrar comportamento.</span>
+        </div>
+      </div>
+
+      <!-- I -->
+      <div class="solid-card">
+        <div class="solid-letter">I</div>
+        <div class="solid-name">Interface Segregation Principle</div>
+        <div class="solid-desc">
+          Clientes não devem ser forçados a depender de <strong>interfaces que não utilizam</strong>. Prefira interfaces pequenas e específicas.
+        </div>
+        <div class="solid-status ok">
+          <span class="status-icon">✅</span>
+          <span>No projeto: <code>NetworkInterface</code> e <code>AiRepository</code> são interfaces mínimas e coesas, com apenas os métodos necessários. Bem aplicado.</span>
+        </div>
+      </div>
+
+      <!-- D -->
+      <div class="solid-card" style="grid-column: 1 / -1;">
+        <div class="solid-letter">D</div>
+        <div class="solid-name">Dependency Inversion Principle</div>
+        <div class="solid-desc">
+          Módulos de alto nível não devem depender de módulos de baixo nível. Ambos devem depender de <strong>abstrações</strong>. Abstrações não devem depender de detalhes — detalhes dependem de abstrações.
+        </div>
+        <div class="two-col">
+          <div>
+            <pre><span class="com">// ❌ VIOLAÇÃO no GameRule (domain)</span>
+<span class="bad"><span class="kw">final</span> AiRepository _aiRepo =
+  <span class="cl">DependencyInjection</span>()
+    .aiRepositoryImpl; <span class="com">// busca concreta!</span></span></pre>
+            <div class="solid-status bad">
+              <span class="status-icon">❌</span>
+              <span>Domain acessa o service locator e busca a implementação concreta. Isso <strong>inverte</strong> a inversão de dependência.</span>
+            </div>
+          </div>
+          <div>
+            <pre><span class="com">// ✅ CORRETO — injeção via construtor</span>
+<span class="good"><span class="kw">class</span> <span class="cl">GameRule</span> {
+  <span class="kw">final</span> AiRepository _aiRepo;
+
+  <span class="cl">GameRule</span>({
+    <span class="kw">required</span> AiRepository repo
+  }) : _aiRepo = repo;
+}</span></pre>
+            </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ NO PROJETO ═══════════════════════ -->
+<section id="projeto">
+  <div class="container">
+    <div class="section-label">Aplicação Prática</div>
+    <h2>Como o Projeto se Encaixa</h2>
+    <p class="section-intro">
+      Veja como cada arquivo do projeto se mapeia nas camadas da Clean Architecture e qual papel desempenha.
+    </p>
+
+    <div style="overflow-x:auto; margin-top: 16px;">
+      <table style="width:100%; border-collapse:collapse; font-size:13px;">
+        <thead>
+          <tr style="border-bottom: 1px solid var(--border);">
+            <th style="text-align:left; padding:12px 16px; color:var(--text-muted); font-weight:600;">Arquivo</th>
+            <th style="text-align:left; padding:12px 16px; color:var(--text-muted); font-weight:600;">Camada</th>
+            <th style="text-align:left; padding:12px 16px; color:var(--text-muted); font-weight:600;">Papel</th>
+            <th style="text-align:left; padding:12px 16px; color:var(--text-muted); font-weight:600;">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px 16px;"><code>game_model.dart</code></td>
+            <td style="padding:12px 16px;"><span style="color:var(--green)">Domain / Entity</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Entidade pura do jogo. Sem dependências externas.</td>
+            <td style="padding:12px 16px;">✅ Correto</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px 16px;"><code>ai_repository.dart</code></td>
+            <td style="padding:12px 16px;"><span style="color:var(--green)">Domain / Repository</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Define o contrato abstrato para a IA. O domain só conhece essa interface.</td>
+            <td style="padding:12px 16px;">✅ Correto</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px 16px;"><code>game_rule.dart</code></td>
+            <td style="padding:12px 16px;"><span style="color:var(--green)">Domain / Use Case</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Orquestra as regras do jogo. Deveria receber dependências via construtor.</td>
+            <td style="padding:12px 16px; color:var(--accent4);">⚠️ Violação DIP</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px 16px;"><code>game_victory_condition.dart</code></td>
+            <td style="padding:12px 16px;"><span style="color:var(--green)">Domain / Logic</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Condições de vitória. Usa variáveis globais mutáveis ao invés de constantes.</td>
+            <td style="padding:12px 16px; color:var(--accent4);">⚠️ Melhoria necessária</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px 16px;"><code>ai_repository_impl.dart</code></td>
+            <td style="padding:12px 16px;"><span style="color:var(--accent2)">Data / Repository</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Implementa o contrato de AI usando o OllamaService. Recebe dependência via construtor.</td>
+            <td style="padding:12px 16px;">✅ Correto</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px 16px;"><code>ollama_service.dart</code> <span class="rule-tag">data/</span></td>
+            <td style="padding:12px 16px;"><span style="color:var(--accent2)">Data / Datasource</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Comunica com a API Ollama. Estende NetworkClient para reutilizar o HTTP.</td>
+            <td style="padding:12px 16px;">✅ Em uso</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px 16px;"><code>network_client.dart</code></td>
+            <td style="padding:12px 16px;"><span style="color:var(--accent3)">Core / Infra</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Implementação HTTP reutilizável. Extensível por herança.</td>
+            <td style="padding:12px 16px;">✅ Correto</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:12px 16px;"><code>home_view_model.dart</code></td>
+            <td style="padding:12px 16px;"><span style="color:var(--accent4)">Presentation / ViewModel</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Estado reativo com MobX. Busca seu próprio GameRule internamente.</td>
+            <td style="padding:12px 16px; color:var(--accent4);">⚠️ Violação DIP</td>
+          </tr>
+          <tr>
+            <td style="padding:12px 16px;"><code>dependency.dart</code></td>
+            <td style="padding:12px 16px;"><span style="color:#a89eff">DI / Composition Root</span></td>
+            <td style="padding:12px 16px; color:var(--text-muted)">Singleton que monta o grafo de dependências. Expõe concretas em vez de abstrações.</td>
+            <td style="padding:12px 16px; color:var(--accent4);">⚠️ Expõe concretas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ PROBLEMAS ═══════════════════════ -->
+<section id="problemas">
+  <div class="container">
+    <div class="section-label">Diagnóstico</div>
+    <h2>Problemas & Pontos Positivos</h2>
+    <p class="section-intro">
+      Análise detalhada de cada aspecto do projeto em relação às premissas arquiteturais.
+    </p>
+
+    <div class="findings-grid">
+
+      <div class="finding ok">
+        <div class="finding-icon">✅</div>
+        <div>
+          <div class="finding-title">Separação de camadas domain / data / presentation</div>
+          <div class="finding-desc">A estrutura de pastas respeita as fronteiras da Clean Architecture. O domain define contratos, o data implementa, e a presentation consome via abstração.</div>
+        </div>
+      </div>
+
+      <div class="finding ok">
+        <div class="finding-icon">✅</div>
+        <div>
+          <div class="finding-title">AiRepository como abstração no domain</div>
+          <div class="finding-desc"><code>AiRepository</code> (abstract) vive no domain e <code>AiRepositoryImpl</code> no data. O fluxo de inversão de dependência está correto nessa relação.</div>
+        </div>
+      </div>
+
+      <div class="finding ok">
+        <div class="finding-icon">✅</div>
+        <div>
+          <div class="finding-title">GameModel como entidade pura</div>
+          <div class="finding-desc"><code>GameModel</code> não contém imports de Flutter, MobX ou qualquer framework. É uma classe Dart pura — exatamente como deve ser no domain.</div>
+        </div>
+      </div>
+
+      <div class="finding bad">
+        <div class="finding-icon">❌</div>
+        <div>
+          <div class="finding-title">GameRule acessa DependencyInjection internamente <span class="rule-tag">DIP</span></div>
+          <div class="finding-desc">
+            <code>GameRule</code> (domain) instancia <code>DependencyInjection().aiRepositoryImpl</code> direto no campo. Isso viola tanto o DIP quanto a Dependency Rule da Clean Architecture — o domain não pode depender da camada de injeção.
+            <pre style="margin-top:10px;">
+<span class="bad"><span class="kw">final</span> AiRepository _aiRepo =
+  <span class="cl">DependencyInjection</span>().aiRepositoryImpl; <span class="com">// ❌ domain → DI</span></span>
+<span class="good"><span class="kw">final</span> AiRepository _aiRepo;           <span class="com">// ✅ receba via construtor</span></span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="finding bad">
+        <div class="finding-icon">❌</div>
+        <div>
+          <div class="finding-title">HomeViewModel acessa DependencyInjection internamente <span class="rule-tag">DIP</span></div>
+          <div class="finding-desc">
+            Mesmo problema: <code>HomeViewModelState</code> busca <code>DependencyInjection().gameRule</code> ao invés de receber a dependência injetada. Isso torna o ViewModel impossível de testar de forma isolada.
+          </div>
+        </div>
+      </div>
+
+      <div class="finding bad">
+        <div class="finding-icon">❌</div>
+        <div>
+          <div class="finding-title">DependencyInjection expõe implementações concretas <span class="rule-tag">DIP</span></div>
+          <div class="finding-desc">
+            <code>late final AiRepositoryImpl aiRepositoryImpl</code> deveria ser <code>late final AiRepository aiRepository</code>. Expor concretas força todos os consumidores a conhecer os detalhes de implementação.
+          </div>
+        </div>
+      </div>
+
+      <div class="finding bad">
+        <div class="finding-icon">❌</div>
+        <div>
+          <div class="finding-title">OllamaService duplicado — código morto em lib/service/ <span class="rule-tag">SRP</span></div>
+          <div class="finding-desc">
+            Existe uma cópia idêntica do <code>OllamaService</code> em <code>lib/service/ollama/</code> que nunca é importada. A pasta <code>service/</code> não tem papel definido na arquitetura e deve ser removida.
+          </div>
+        </div>
+      </div>
+
+      <div class="finding warn">
+        <div class="finding-icon">⚠️</div>
+        <div>
+          <div class="finding-title">Variáveis globais mutáveis em game_victory_condition.dart <span class="rule-tag">SRP</span></div>
+          <div class="finding-desc">
+            <code>List&lt;int&gt; verticalFirstColumn = [0,3,6]</code> são variáveis globais que podem ser mutadas acidentalmente. Deveriam ser constantes encapsuladas em uma classe.
+          </div>
+        </div>
+      </div>
+
+      <div class="finding warn">
+        <div class="finding-icon">⚠️</div>
+        <div>
+          <div class="finding-title">Bug lógico: diagonalFirstCondition incorreto</div>
+          <div class="finding-desc">
+            <code>diagonalFirstCondition = [1,4,8]</code> está errado. A diagonal principal do Tic-Tac-Toe é <code>[0,4,8]</code>. Índice 1 é a coluna do meio na primeira linha, não um canto.
+          </div>
+        </div>
+      </div>
+
+      <div class="finding warn">
+        <div class="finding-icon">⚠️</div>
+        <div>
+          <div class="finding-title">Ausência de Use Cases explícitos</div>
+          <div class="finding-desc">
+            A Clean Architecture recomenda uma camada de Use Cases separada. Atualmente, <code>GameRule</code> acumula responsabilidades que seriam melhor divididas em <code>PlayMoveUseCase</code>, <code>ResetGameUseCase</code>, etc.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ SCORE ═══════════════════════ -->
+<section id="score">
+  <div class="container">
+    <div class="section-label">Resumo</div>
+    <h2>Pontuação de Conformidade</h2>
+    <p class="section-intro">
+      Avaliação geral do projeto em relação às premissas de Clean Architecture e princípios SOLID.
+    </p>
+
+    <div class="score-grid">
+      <div class="score-card score-ok">
+        <div class="score-num">3</div>
+        <div class="score-label">✅ Pontos corretos</div>
+      </div>
+      <div class="score-card score-warn">
+        <div class="score-num">3</div>
+        <div class="score-label">⚠️ Melhorias necessárias</div>
+      </div>
+      <div class="score-card score-bad">
+        <div class="score-num">4</div>
+        <div class="score-label">❌ Violações críticas</div>
+      </div>
+      <div class="score-card" style="border-color: rgba(108,99,255,0.3);">
+        <div class="score-num" style="color: var(--accent);">~45%</div>
+        <div class="score-label">Conformidade geral estimada</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top: 28px;">
+      <h3 style="margin-bottom:16px;">🎯 Prioridade de Correção</h3>
+      <ol style="padding-left: 20px; display: grid; gap: 10px; font-size: 14px; color: var(--text-muted);">
+        <li><strong style="color:var(--text)">Injetar dependências via construtor</strong> em <code>GameRule</code> e <code>HomeViewModel</code> — maior impacto em testabilidade e conformidade DIP</li>
+        <li><strong style="color:var(--text)">Remover <code>lib/service/</code></strong> — pasta com código morto, duplicada sem propósito</li>
+        <li><strong style="color:var(--text)">Expor abstrações no DependencyInjection</strong> — <code>AiRepository</code> em vez de <code>AiRepositoryImpl</code></li>
+        <li><strong style="color:var(--text)">Corrigir <code>diagonalFirstCondition</code></strong> — bug funcional (<code>[1,4,8]</code> → <code>[0,4,8]</code>)</li>
+        <li><strong style="color:var(--text)">Encapsular constantes de vitória</strong> em uma classe com campos <code>static const</code></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FOOTER ═══════════════════════ -->
+<footer>
+  <div class="container">
+    <p>Gerado para o projeto <span>Tic-Tac-Toe Flutter + Ollama AI</span> · Clean Architecture por Robert C. Martin · SOLID por Michael Feathers</p>
+  </div>
+</footer>
+
+</body>
+</html>
