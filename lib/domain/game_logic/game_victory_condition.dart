@@ -18,7 +18,7 @@ class VictoryConditions {
   static const List<int> horizontalThirdRow  = [6, 7, 8];
 
   /// Diagonal winning combinations.
-  static const List<int> diagonalFirst  = [1, 4, 8];
+  static const List<int> diagonalFirst  = [0, 4, 8];
   static const List<int> diagonalSecond = [2, 4, 6];
 
   /// All possible winning combinations.
