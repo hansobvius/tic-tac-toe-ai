@@ -23,9 +23,13 @@ The project follows Clean Architecture principles within the `lib/` directory:
   - `repository/`: Repository implementations that bridge domain and data layers.
   
 - **`domain/`**: Business logic and domain models.
-  - `entities/`: Domain entities and models.
-  - `game_logic/`: Game rules and logic.
-  - `repository/`: Repository interfaces (contracts).
+  - `entities/`: Domain entities (`GameModel`).
+  - `enums/`: Domain enums (`Player`, `GameStatus`).
+  - `failures/`: Domain failure classes (`Failure`, `AiUnavailableFailure`, `InvalidMoveFailure`).
+  - `game_logic/`: Game rules (`GameRule`) and victory conditions (`VictoryConditions`).
+  - `repository/`: Repository interfaces/contracts (`AiRepository`).
+  - `usecases/`: Application use cases (`PlayMoveUseCase`, `OpponentPlayUseCase`, `ResetGameUseCase`).
+  - `value_objects/`: Value objects with self-validation (`BoardPosition`).
   
 - **`presentation/`**: UI and state management.
   - `ui/`: Screens and UI components.
@@ -33,6 +37,55 @@ The project follows Clean Architecture principles within the `lib/` directory:
   - `routes/`: App navigation and routing.
   
 - **`dependency_injection/`**: Dependency injection setup and service locator configuration.
+
+## Domain Architecture
+
+The domain layer follows **Clean Architecture** and **SOLID** principles, ensuring the business logic is framework-independent and highly testable.
+
+### Enums
+
+| Enum | Values | Description |
+| :--- | :--- | :--- |
+| `Player` | `first`, `second` | Identifies the two players in the game. |
+| `GameStatus` | `playing`, `playerWon`, `opponentWon`, `draw` | Represents the current state of the game lifecycle. |
+
+### Entity
+
+- **`GameModel`**: The core domain entity that holds the complete game state — board squares for each player, win/round counters, current `GameStatus`, and the active `Player`.
+
+### Value Objects
+
+- **`BoardPosition`**: Encapsulates a valid board index (0–8) with built-in validation. Throws `ArgumentError` if an out-of-range index is provided, preventing invalid positions from propagating through the domain.
+
+### Failures
+
+Domain failures represent **expected error conditions** in the business logic, as opposed to unexpected infrastructure exceptions.
+
+| Failure | Description |
+| :--- | :--- |
+| `Failure` (abstract) | Base class carrying a `message` string. |
+| `AiUnavailableFailure` | The AI service is unreachable or returned an error. |
+| `InvalidMoveFailure` | The AI returned a move that is not valid on the current board. |
+
+### Use Cases
+
+Each use case encapsulates a single user action, following the **Single Responsibility Principle**:
+
+| Use Case | Input | Output | Description |
+| :--- | :--- | :--- | :--- |
+| `PlayMoveUseCase` | `BoardPosition`, `GameModel` | `GameModel` | Validates and applies a human player's move, checks victory/draw, and switches turn. |
+| `OpponentPlayUseCase` | `GameModel` | `(GameModel, Failure?)` | Delegates to `AiRepository` for the AI's move, validates it, retries on invalid moves, and checks end-game conditions. |
+| `ResetGameUseCase` | — | `GameModel` | Returns a fresh `GameModel` with all state cleared. |
+
+### Game Logic
+
+- **`GameRule`**: Orchestrator class that manages the overall game flow — player moves, AI opponent moves, winner checking, and game reset. Depends on `AiRepository` (injected).
+- **`VictoryConditions`**: Static utility listing all 8 winning combinations (3 vertical, 3 horizontal, 2 diagonal) and providing a `hasWinner()` method to check a player's moves against them.
+
+### Repository (Contract)
+
+- **`AiRepository`** (abstract): Defines the contract for AI move generation. The domain layer declares the interface; the **data layer** provides the implementation (`AiRepositoryImpl`), following the **Dependency Inversion Principle**.
+  - `getNextMove(boardState, yourMoves)` → `Future<(BoardPosition?, Failure?)>`
 
 ## Prerequisites
 

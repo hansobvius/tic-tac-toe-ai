@@ -38,15 +38,16 @@ class GameRule {
   }
 
    Future<(bool, String?)> opponentPlay(List<int> opponnetBoardIndicies) async {
-    final (index, error) = await _aiRepository.getNextMove(
+    final (position, failure) = await _aiRepository.getNextMove(
       _gameModel.selectedBoardSquares, opponnetBoardIndicies);       
     
-    if (error != null) {
-      debugPrint("OLLAMA ERROR: $error");
-      return (true, error);
+    if (failure != null) {
+      debugPrint("OLLAMA ERROR: ${failure.message}");
+      return (true, failure.message);
     }
 
-    if (index != null) {
+    if (position != null) {
+      final index = position.index;
       debugPrint("VIEW_MODEL opponentPlay index: $index / currentUserPlay : $currentUserPlay");
 
       if (_gameModel.selectedBoardSquares.contains(index)) {
@@ -64,13 +65,13 @@ class GameRule {
   }
 
   void checkWinner() {
-    if (hasWinnerNumbers(_gameModel.firstBoardSquares)) {
+    if (VictoryConditions.hasWinner(_gameModel.firstBoardSquares)) {
       isGameTerminated = true;
       winnerPlayer = 1;
       // Ideally update wins in GameModel here if needed, but for now just marking termination
     }
     
-    if (hasWinnerNumbers(_gameModel.secondBoardSquares)) {
+    if (VictoryConditions.hasWinner(_gameModel.secondBoardSquares)) {
        isGameTerminated = true;
        winnerPlayer = 2;
     }

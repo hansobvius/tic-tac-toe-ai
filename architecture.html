@@ -625,12 +625,19 @@
     <div class="layers-grid">
       <div class="layer-card domain">
         <div class="layer-title"><span class="layer-dot"></span>Domain</div>
-        <p>Núcleo da aplicação. Contém entidades e regras de negócio puras. <strong>Zero dependência</strong> de frameworks ou infraestrutura.</p>
+        <p>Núcleo da aplicação. Contém entidades, regras de negócio, enums, value objects, failures e use cases. <strong>Zero dependência</strong> de frameworks ou infraestrutura.</p>
         <div>
           <span class="file-tag">📄 game_model.dart</span>
           <span class="file-tag">📄 ai_repository.dart</span>
           <span class="file-tag">📄 game_rule.dart</span>
           <span class="file-tag">📄 game_victory_condition.dart</span>
+          <span class="file-tag">📄 game_status.dart</span>
+          <span class="file-tag">📄 player.dart</span>
+          <span class="file-tag">📄 board_position.dart</span>
+          <span class="file-tag">📄 failure.dart</span>
+          <span class="file-tag">📄 play_move_use_case.dart</span>
+          <span class="file-tag">📄 opponent_play_use_case.dart</span>
+          <span class="file-tag">📄 reset_game_use_case.dart</span>
         </div>
       </div>
       <div class="layer-card data">
@@ -836,6 +843,136 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- ─── Inversão de Dependência na Prática ─── -->
+    <div style="margin-top: 56px;">
+      <h3 style="margin-bottom: 6px;">🔄 Inversão de Dependência na Prática</h3>
+      <p class="section-intro">
+        O coração da Clean Architecture neste projeto é a relação <strong>Domain ↔ Data</strong>. Veja os 3 pontos-chave que garantem o desacoplamento:
+      </p>
+
+      <!-- Ponto 1 -->
+      <div class="card" style="margin-bottom: 16px; border-left: 3px solid var(--green);">
+        <h3 style="color: var(--green); font-size: 14px;">① O Domain define a interface (contrato abstrato)</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin: 10px 0;">
+          A classe <code>AiRepository</code> vive no <strong>domain</strong> como uma classe abstrata.
+          Ela define <em>o que</em> o sistema precisa (um método para obter a próxima jogada), mas <strong>não sabe como</strong> isso é implementado.
+          Nenhuma biblioteca HTTP, API ou framework é importada aqui.
+        </p>
+        <pre><span class="com">// 📁 domain/repository/ai_repository.dart</span>
+
+<span class="kw">abstract class</span> <span class="cl">AiRepository</span> {
+  <span class="com">/// Retorna BoardPosition (sucesso) ou Failure (erro).</span>
+  <span class="com">/// Usa apenas tipos do domain — nunca tipos de infraestrutura.</span>
+  Future&lt;(<span class="cl">BoardPosition</span>?, <span class="cl">Failure</span>?)&gt; <span class="fn">getNextMove</span>(
+    List&lt;<span class="kw">int</span>&gt; boardState,
+    List&lt;<span class="kw">int</span>&gt; yourMoves,
+  );
+}</pre>
+      </div>
+
+      <!-- Ponto 2 -->
+      <div class="card" style="margin-bottom: 16px; border-left: 3px solid var(--accent2);">
+        <h3 style="color: var(--accent2); font-size: 14px;">② O Data implementa a interface</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin: 10px 0;">
+          A classe <code>AiRepositoryImpl</code> vive no <strong>data</strong> e implementa o contrato.
+          Ela conhece o <code>OllamaService</code> e é responsável por <strong>traduzir</strong> os dados externos (JSON da API) para os tipos do domain (<code>BoardPosition</code>, <code>Failure</code>).
+          O domain nunca sabe que o Ollama existe.
+        </p>
+        <pre><span class="com">// 📁 data/repository/ai_repository_impl.dart</span>
+
+<span class="kw">class</span> <span class="cl">AiRepositoryImpl</span> <span class="kw">implements</span> <span class="cl">AiRepository</span> {
+  <span class="kw">final</span> <span class="cl">OllamaService</span> _ollamaService;
+
+  <span class="cl">AiRepositoryImpl</span>({<span class="kw">required</span> <span class="cl">OllamaService</span> ollamaService})
+      : _ollamaService = ollamaService;
+
+  @override
+  Future&lt;(<span class="cl">BoardPosition</span>?, <span class="cl">Failure</span>?)&gt; <span class="fn">getNextMove</span>(...) <span class="kw">async</span> {
+    <span class="com">// Chama o OllamaService (HTTP) e converte para tipos do domain</span>
+    <span class="com">// JSON → BoardPosition (Value Object do domain)</span>
+    <span class="com">// Erros HTTP → Failure (classe de erro do domain)</span>
+  }
+}</pre>
+      </div>
+
+      <!-- Ponto 3 -->
+      <div class="card" style="margin-bottom: 16px; border-left: 3px solid var(--accent3);">
+        <h3 style="color: var(--accent3); font-size: 14px;">③ O OllamaService é o Datasource (acesso externo)</h3>
+        <p style="font-size: 13px; color: var(--text-muted); margin: 10px 0;">
+          O <code>OllamaService</code> vive em <code>data/datasources/</code> e é responsável exclusivamente pela <strong>comunicação HTTP</strong> com a API do Ollama.
+          Ele estende <code>NetworkClient</code> (camada core) para reutilizar a lógica de requisições.
+          Ele <strong>não conhece</strong> o domain — apenas retorna dados brutos que o <code>AiRepositoryImpl</code> traduz.
+        </p>
+        <pre><span class="com">// 📁 data/datasources/ollama/ollama_service.dart</span>
+
+<span class="kw">class</span> <span class="cl">OllamaService</span> <span class="kw">extends</span> <span class="cl">NetworkClient</span> {
+  <span class="com">// Faz requisições HTTP POST para a API do Ollama</span>
+  <span class="com">// Retorna dados brutos (String, Map) — sem tipos do domain</span>
+  Future&lt;(<span class="kw">int</span>?, <span class="kw">String</span>?)&gt; <span class="fn">getNextMove</span>(...) <span class="kw">async</span> { ... }
+}</pre>
+      </div>
+
+      <!-- Diagrama visual do fluxo -->
+      <div style="margin-top: 32px;">
+        <h3 style="margin-bottom: 16px;">📊 Fluxo de Dependências Completo</h3>
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 24px 0; padding: 28px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);">
+          <div style="text-align: center;">
+            <div class="dep-box domain" style="min-width: 150px;">
+              🧠 <strong>Domain</strong><br/>
+              <small>AiRepository</small><br/>
+              <small style="opacity:0.7;">(interface abstrata)</small>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; align-items: center; padding: 0 12px;">
+            <span style="font-size: 11px; color: var(--accent2); margin-bottom: 4px;">implements</span>
+            <span class="dep-arrow">←</span>
+          </div>
+
+          <div style="text-align: center;">
+            <div class="dep-box data" style="min-width: 150px;">
+              💾 <strong>Data</strong><br/>
+              <small>AiRepositoryImpl</small><br/>
+              <small style="opacity:0.7;">(traduz dados ↔ domain)</small>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; align-items: center; padding: 0 12px;">
+            <span style="font-size: 11px; color: var(--accent3); margin-bottom: 4px;">usa</span>
+            <span class="dep-arrow">→</span>
+          </div>
+
+          <div style="text-align: center;">
+            <div class="dep-box core" style="min-width: 150px;">
+              🌐 <strong>Datasource</strong><br/>
+              <small>OllamaService</small><br/>
+              <small style="opacity:0.7;">(HTTP / API externa)</small>
+            </div>
+          </div>
+        </div>
+
+        <p style="text-align:center; font-size:12px; color: var(--text-muted); margin-bottom: 12px;">
+          ⚡ O <code>Domain</code> define os tipos (<code>BoardPosition</code>, <code>Failure</code>). O <code>Data</code> converte dados brutos da API nesses tipos. O <code>Datasource</code> apenas faz chamadas HTTP.
+        </p>
+
+        <!-- Resumo visual de tipos na fronteira -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
+          <div class="card" style="border-left: 3px solid var(--green);">
+            <h3 style="font-size: 13px; color: var(--green); margin-bottom: 8px;">📦 Value Objects do Domain</h3>
+            <p style="font-size: 12px; color: var(--text-muted);">
+              <code>BoardPosition</code> — encapsula uma posição válida (0–8) no tabuleiro. Garante que posições inválidas nunca passem pela camada de domínio.
+            </p>
+          </div>
+          <div class="card" style="border-left: 3px solid var(--red);">
+            <h3 style="font-size: 13px; color: var(--red); margin-bottom: 8px;">💥 Failures do Domain</h3>
+            <p style="font-size: 12px; color: var(--text-muted);">
+              <code>AiUnavailableFailure</code>, <code>InvalidMoveFailure</code> — representam erros de negócio esperados. Substituem exceções genéricas por tipos explícitos e tipados.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

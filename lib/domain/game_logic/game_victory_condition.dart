@@ -1,33 +1,40 @@
 import 'package:tic_tac_toe/resources/extensions/list_extension.dart';
 
-/// GAME RULES FOR WINNING CONDITIONS
+/// Encapsulates all winning conditions for Tic-Tac-Toe.
+///
+/// Uses [static const] to prevent accidental mutation and
+/// provide a single source of truth for victory validation.
+class VictoryConditions {
+  VictoryConditions._();
 
-/// Vertical condition
-List<int> verticalFirstColumn  = [0,3,6];
-List<int> verticalSecondColumn = [1,4,7];
-List<int> verticalThirdColumn  = [2,5,8];
+  /// Vertical winning combinations.
+  static const List<int> verticalFirstColumn  = [0, 3, 6];
+  static const List<int> verticalSecondColumn = [1, 4, 7];
+  static const List<int> verticalThirdColumn  = [2, 5, 8];
 
-/// Horizontal condition
-List<int> horizontalFirstCondition  = [0,1,2];
-List<int> horizontalSecondCondition = [3,4,5];
-List<int> horizontalThirdCondition  = [6,7,8];
+  /// Horizontal winning combinations.
+  static const List<int> horizontalFirstRow  = [0, 1, 2];
+  static const List<int> horizontalSecondRow = [3, 4, 5];
+  static const List<int> horizontalThirdRow  = [6, 7, 8];
 
-/// Diagonal condition
-List<int> diagonalFirstCondition  = [1,4,8];
-List<int> diagonalSecondCondition = [2,4,6];
+  /// Diagonal winning combinations.
+  static const List<int> diagonalFirst  = [0, 4, 8];
+  static const List<int> diagonalSecond = [2, 4, 6];
 
-bool hasWinnerNumbers(List<int> list) {
-  if (
-    list.containsElements(verticalFirstColumn)       ||
-    list.containsElements(verticalSecondColumn)      ||
-    list.containsElements(verticalThirdColumn)       ||
-    list.containsElements(horizontalFirstCondition)  ||
-    list.containsElements(horizontalSecondCondition) ||
-    list.containsElements(horizontalThirdCondition)  ||
-    list.containsElements(diagonalFirstCondition)    ||
-    list.containsElements(diagonalSecondCondition)
-  ) {
-    return true;
+  /// All possible winning combinations.
+  static const List<List<int>> allConditions = [
+    verticalFirstColumn,
+    verticalSecondColumn,
+    verticalThirdColumn,
+    horizontalFirstRow,
+    horizontalSecondRow,
+    horizontalThirdRow,
+    diagonalFirst,
+    diagonalSecond,
+  ];
+
+  /// Checks if the given [moves] contain any winning combination.
+  static bool hasWinner(List<int> moves) {
+    return allConditions.any((condition) => moves.containsElements(condition));
   }
-  return false;
 }
