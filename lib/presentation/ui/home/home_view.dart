@@ -79,14 +79,18 @@ class HomeView extends StatelessWidget {
                     )
                   ],
                 ),
-                GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0,
-                  ),
+                Flexible(
+                  child: AspectRatio(
+                    aspectRatio: 1.0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 4.0,
+                          mainAxisSpacing: 4.0,
+                        ),
                   itemCount: 9,
                   itemBuilder: (context, index) {
                     final int rowIndex = index ~/ 3;
@@ -125,6 +129,9 @@ class HomeView extends StatelessWidget {
                       }
                     );
                   },
+                ),
+                    ),
+                  ),
                 ),
                 Observer(
                   builder: (context) {
