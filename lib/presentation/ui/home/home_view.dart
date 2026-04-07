@@ -91,27 +91,36 @@ class HomeView extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final int rowIndex = index ~/ 3;
                     final int columnIndex = index % 3;
-                    return Observer(
-                      builder: (context) {
-            
-                        var fontSize = MediaQuery.of(context).size.width * 0.25;
-            
-                        return GestureDetector(
-                          onTap: () {
-                            viewModel.setPlay(index: index);
-                          },
-                          child: Container(
-                            color: Theme.of(context).colorScheme.primaryContainer,
-                            alignment: Alignment.center,
-                            child: Text(
-                              viewModel.getSymbol(index),
-                              style: TextStyle(
-                                fontSize: fontSize,
-                                fontWeight: FontWeight.w900,
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        final cellSize = constraints.maxWidth < constraints.maxHeight
+                            ? constraints.maxWidth
+                            : constraints.maxHeight;
+                        final fontSize = cellSize * 0.6;
+                        
+                        return Observer(
+                          builder: (context) {
+                            return GestureDetector(
+                              onTap: () {
+                                viewModel.setPlay(index: index);
+                              },
+                              child: Container(
+                                color: Theme.of(context).colorScheme.primaryContainer,
+                                alignment: Alignment.center,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    viewModel.getSymbol(index),
+                                    style: TextStyle(
+                                      fontSize: fontSize,
+                                      fontWeight: FontWeight.w900,
+                                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          }
                         );
                       }
                     );
