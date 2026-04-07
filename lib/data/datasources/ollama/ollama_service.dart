@@ -1,14 +1,26 @@
 import 'package:flutter/foundation.dart';
-import 'dart:convert';
 import 'package:tic_tac_toe/core/network/network_client.dart';
+import 'package:tic_tac_toe/data/datasources/ollama/ollama_response_dto.dart';
 
-class OllamaService extends NetworkClient{
+/// COMMAND: flutter test test/data/datasources/ollama/ollama_service_test.dart
+
+/// Datasource responsible for communicating with the Ollama API.
+///
+/// Handles only HTTP concerns: building requests, sending them,
+/// and converting raw responses into DTOs. No domain logic here.
+class OllamaService extends NetworkClient {
   final String modelName;
 
   OllamaService({this.modelName = 'llama3'});
 
-  Future<(int?, String?)> getNextMove(List<int> boardState, List<int> yourMoves,
-      {bool isRetry = false}) async {
+  /// Sends the board state to Ollama and returns a parsed [OllamaResponseDTO].
+  ///
+  /// Returns `(dto, null)` on success or `(null, errorMessage)` on failure.
+  Future<(OllamaResponseDTO?, String?)> getNextMove(
+    List<int> boardState,
+    List<int> yourMoves, {
+    bool isRetry = false,
+  }) async {
     final prompt = _generatePrompt(boardState, yourMoves);
 
     final (jsonResponse, statusCode, message) = await post(
@@ -25,15 +37,14 @@ class OllamaService extends NetworkClient{
       if (jsonResponse.containsKey('response')) {
         final responseText = jsonResponse['response'];
         try {
-          final move = _parseMove(responseText);
-          return (move, null);
+          final dto = OllamaResponseDTO.fromResponseText(responseText);
+          return (dto, null);
         } catch (e) {
           return (null, 'Failed to parse AI response: $responseText');
         }
       }
       return (null, 'Key "response" not found in JSON');
     } else if (statusCode == 404 && !isRetry) {
-      // Model not found, try to pull it
       debugPrint('Model $modelName not found. Attempting to pull...');
       final pullSuccess = await _pullModel();
       if (pullSuccess) {
@@ -92,19 +103,5 @@ Analyze the board.
 Return ONLY a JSON object with a single field "move" containing the index (0-8) of your move.
 Example: {"move": 4}
 ''';
-  }
-
-  int _parseMove(String responseText) {
-    try {
-      // Clean up the response in case there's extra text (though format: json should prevent this)
-      final cleanJson = responseText.trim();
-      final Map<String, dynamic> data = jsonDecode(cleanJson);
-      if (data.containsKey('move')) {
-        return data['move'] as int;
-      }
-      throw Exception('Response did not contain "move" field');
-    } catch (e) {
-      throw Exception('Failed to parse AI response: $responseText');
-    }
   }
 }

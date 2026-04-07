@@ -35,15 +35,15 @@ PORT=11434
       print('----------------------------------------------------------------');
       
       try {
-        final (move, error) = await ollamaService.getNextMove(boardState, aiMoves);
-        print('Received move from Ollama: $move');
+        final (dto, error) = await ollamaService.getNextMove(boardState, aiMoves);
+        print('Received DTO from Ollama: $dto');
         print('Received error from Ollama: $error');
 
         // Since the user might have Docker stopped, we handle both cases to verify the Record mechanism works.
-        if (move != null) {
-           expect(move, greaterThanOrEqualTo(0));
-           expect(move, lessThanOrEqualTo(8));
-           expect(boardState[move], 0, reason: 'AI picked an occupied spot at index $move');
+        if (dto != null) {
+           expect(dto.move, greaterThanOrEqualTo(0));
+           expect(dto.move, lessThanOrEqualTo(8));
+           expect(boardState[dto.move], 0, reason: 'AI picked an occupied spot at index ${dto.move}');
         } else {
            expect(error, isNotNull);
            print('Test passed: Gracefully handled error: $error');
