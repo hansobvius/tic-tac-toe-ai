@@ -135,17 +135,20 @@ class HomeView extends StatelessWidget {
                 ),
                 Observer(
                   builder: (context) {
-                    if (viewModel.opponnetThinking) {
-                      return Text(
+                    return Visibility(
+                      visible: viewModel.opponnetThinking,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: Text(
                         "Opponent is thinking...",
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
                           fontSize: 32.0
                         )
-                      );
-                    }
-                    return SizedBox();
+                      ),
+                    );
                   },
                 )
               ],
