@@ -79,57 +79,76 @@ class HomeView extends StatelessWidget {
                     )
                   ],
                 ),
-                GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 4.0,
-                    mainAxisSpacing: 4.0,
-                  ),
+                Flexible(
+                  child: AspectRatio(
+                    aspectRatio: 1.0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 4.0,
+                          mainAxisSpacing: 4.0,
+                        ),
                   itemCount: 9,
                   itemBuilder: (context, index) {
                     final int rowIndex = index ~/ 3;
                     final int columnIndex = index % 3;
-                    return Observer(
-                      builder: (context) {
-            
-                        var fontSize = MediaQuery.of(context).size.width * 0.25;
-            
-                        return GestureDetector(
-                          onTap: () {
-                            viewModel.setPlay(index: index);
-                          },
-                          child: Container(
-                            color: Theme.of(context).colorScheme.primaryContainer,
-                            alignment: Alignment.center,
-                            child: Text(
-                              viewModel.getSymbol(index),
-                              style: TextStyle(
-                                fontSize: fontSize,
-                                fontWeight: FontWeight.w900,
-                                color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        final cellSize = constraints.maxWidth < constraints.maxHeight
+                            ? constraints.maxWidth
+                            : constraints.maxHeight;
+                        final fontSize = cellSize * 0.6;
+                        
+                        return Observer(
+                          builder: (context) {
+                            return GestureDetector(
+                              onTap: () {
+                                viewModel.setPlay(index: index);
+                              },
+                              child: Container(
+                                color: Theme.of(context).colorScheme.primaryContainer,
+                                alignment: Alignment.center,
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    viewModel.getSymbol(index),
+                                    style: TextStyle(
+                                      fontSize: fontSize,
+                                      fontWeight: FontWeight.w900,
+                                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          }
                         );
                       }
                     );
                   },
                 ),
+                    ),
+                  ),
+                ),
                 Observer(
                   builder: (context) {
-                    if (viewModel.opponnetThinking) {
-                      return Text(
+                    return Visibility(
+                      visible: viewModel.opponnetThinking,
+                      maintainSize: true,
+                      maintainAnimation: true,
+                      maintainState: true,
+                      child: Text(
                         "Opponent is thinking...",
                         style: TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
                           fontSize: 32.0
                         )
-                      );
-                    }
-                    return SizedBox();
+                      ),
+                    );
                   },
                 )
               ],
