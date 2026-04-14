@@ -19,7 +19,7 @@ This document outlines the core structural and architectural rules for this AI T
 - **Exceptions exclusively in Data**: The `data` layer may throw Exceptions (e.g., `ServerException`, `OllamaException`), but these must be caught and converted into appropriate `Failure` objects before crossing into the `presentation` layer via the `domain`.
 
 ## 4. Workflows over Ad-hoc Creation
-- Always check the `_agents/workflows/` directory for standardized procedures before creating large architectural pieces. If requested to create a branch, ALWAYS use the `create_branch.md` workflow.
+- Always check the `.agents/workflows/` directory for standardized procedures before creating large architectural pieces. If requested to create a branch, ALWAYS use the `create_branch.md` workflow.
 - Do not invent folder structures that deviate from the existing `lib` pattern (`core`, `data`, `dependency_injection`, `domain`, `presentation`, `resources`).
 
 ## 5. Testing
