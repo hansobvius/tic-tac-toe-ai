@@ -28,7 +28,7 @@ void main() async {
         print('    Rodando a Skill de Análise de Código...');
         
         // Executa o flutter analyze passando o caminho específico do arquivo para ser rápido
-        final result = await Process.run('flutter', ['analyze', event.path]);
+        final result = await Process.run('flutter', ['analyze', event.path], runInShell: true);
         
         if (result.exitCode == 0) {
           print('    \x1B[32m✓ Nenhuma violação das regras (.clinerules ou linters) encontrada neste arquivo!\x1B[0m');
