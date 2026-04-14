@@ -1,0 +1,23 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Auto-Start AI Skill: Watcher",
+      "type": "shell",
+      "command": "dart",
+      "args": [
+        "run",
+        ".agents/skills/analyze_on_save.dart"
+      ],
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "echo": false
+      }
+    }
+  ]
+}
