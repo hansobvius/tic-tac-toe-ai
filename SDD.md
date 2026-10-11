@@ -5,7 +5,7 @@ This document outlines the **Specification-Driven Development (SDD)** premise ut
 ## 1. Core Principles
 
 ### 1.1 The Single Source of Truth (SSOT)
-The `SPECIFICATION.md` file is the ultimate source of truth for the project. It defines the architecture, rules, domain models, and technical constraints.
+The `PRODUCT_SPEC.md` and `ARCHTECTURE_SPEC.md` files are the ultimate source of truth for the project. They define the system requirements, business rules, architecture, domain models, and technical constraints.
 - **No code is above the specification**: If code behaves differently than the specification, the code is considered broken (unless it is a deliberate architectural shift, in which case the specification must be updated *first*).
 
 ### 1.2 Spec-First Development
@@ -18,9 +18,9 @@ All new features, structural changes, or significant refactors must begin with a
 Whenever working on an issue, feature, or refactor, you (and any AI agents) must adhere to the following sequence:
 
 ### Step 1: Analyze & Update Specification
-1. Read the existing `SPECIFICATION.md` and related documentation.
+1. Read the existing `PRODUCT_SPEC.md`, `ARCHTECTURE_SPEC.md` and related documentation.
 2. Formulate the technical design for the new feature or change.
-3. **Update `SPECIFICATION.md`** (or create a new specialized specification document if the domain is too large) to reflect the new state of the application.
+3. **Update `PRODUCT_SPEC.md` and/or `ARCHTECTURE_SPEC.md`** (or create a new specialized specification document if the domain is too large) to reflect the new state of the application.
 
 ### Step 2: Test-Driven Development (TDD) Alignment
 1. Using the updated specification as a strict contract, write the necessary unit, integration, or widget tests.
@@ -37,7 +37,7 @@ Whenever working on an issue, feature, or refactor, you (and any AI agents) must
 ## 3. AI Agent Contract
 
 When AI assistants (such as Gemini) are utilized in this project, they must operate under these strict SDD guidelines:
-* **Context Gathering**: The agent MUST always read the `SPECIFICATION.md` before proposing architectural changes or large feature implementations.
+* **Context Gathering**: The agent MUST always read `PRODUCT_SPEC.md` and `ARCHTECTURE_SPEC.md` before proposing architectural changes or large feature implementations.
 * **Proposing Changes**: If a user requests a feature that contradicts the existing specification (e.g., adding a dependency to the Domain layer), the AI must warn the user and request permission to update the specification before implementing the code.
 * **Artifacts & Planning**: The AI should utilize Implementation Plans to outline how the specification will be updated alongside the code changes.
 
