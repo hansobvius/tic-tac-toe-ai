@@ -9,7 +9,7 @@ services:
     environment:
       - OLLAMA_HOST=0.0.0.0:11434
     gpus: all
-    restart: always
+    restart: "no"
   
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -22,7 +22,7 @@ services:
       - 'OLLAMA_BASE_URL=http://ollama:11434'
     volumes:
       - open-webui_data:/app/backend/data
-    restart: unless-stopped
+    restart: "no"
     depends_on:
       - ollama
 
