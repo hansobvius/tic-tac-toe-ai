@@ -31,3 +31,8 @@ Skills are the "muscles" or "power tools" of the ecosystem. Unlike passive markd
     *   **What it does:** A custom, native Dart listener script. It actively watches the project directory and hooks into the system's file save event. Upon saving any `.dart` file, it instantly runs a localized `flutter analyze` passing only the modified file, delivering lightning-fast static analysis feedback right in the terminal.
     *   **How it is triggered:** **Execution (Script Run)**. The `.md` file declares the capability and syntax to the AI, mapping out how the skill is operated. The physical trigger is executing the `dart run .agents/skills/analyze_on_save.dart` command. 
         *   *Workspace Trigger:* In this project, to eliminate friction, this skill is configured inside `.vscode/tasks.json` (`runOn: folderOpen`) to be **triggered automatically in a background terminal the exact moment the user opens the project in VS Code**.
+
+*   **`update_docker_images`** (`update_docker_images/SKILL.md` & `update_docker_images/scripts/update.dart`)
+    *   **What it does:** Automatiza o download e atualização das imagens do Docker (`docker compose pull`) do ecossistema local do projeto (Ollama e Open-WebUI), permitindo também reiniciar contêineres com `--restart`.
+    *   **How it is triggered:** **Execution (Script Run)** via `dart run .agents/skills/update_docker_images/scripts/update.dart` ou solicitação direta à IA.
+
